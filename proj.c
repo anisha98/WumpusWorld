@@ -1,13 +1,51 @@
+#include<GLUT/glut.h>
+#include<OpenGL/gl.h>
 #include<stdio.h>
 //#include<GL/glut.h>
 #include<math.h>
-#include<GL/glut.h>
-
 #define CIRCLE_RADIUS 0.15f
+#define pi 3.142857
+#define learning_rate 0.1
+#define discount 0.9
+
+//left top right bottom
+environment_matrix[15][4] = { {NULL, NULL, 0, NULL},
+							{0, 0, 0, NULL},
+							{0, NULL, 0, NULL},
+							{0, 0, NULL, NULL},
+							{NULL, NULL, NULL, NULL},
+							{NULL, NULL, NULL, 0},
+							{NULL, NULL, NULL, NULL}, //WUMPUS
+							{NULL, 0, NULL, 0},
+							{0, 0, 0, 0}, //GOLD
+							{NULL, NULL, NULL, NULL},
+							{NULL, 0, 0, NULL},
+							{0, 0, NULL, 0},
+							{NULL, NULL, 0, 0}, //FINDS GOLD
+							{0, NULL, 0, NULL},
+							{0, NULL, 0, 0},
+							{0, NULL, NULL, 0}
+						};
+//q[possible_states][actions]
+int q_matrix[15][4] = { {0, 0, 0, 0},
+							{0, 0, 0, 0},
+							{0, 0, 0, 0},
+							{0, 0, 0, 0},
+							{0, 0, 0, 0},
+							{0, 0, 0, 0},
+							{0, 0, 0, 0}, //WUMPUS
+							{0, 0, 0, 0},
+							{0, 0, 0, 0}, //GOLD
+							{0, 0, 0, 0},
+							{0, 0, 0, 0},
+							{0, 0, 0, 0},
+							{0, 0, 0, 0}, //FINDS GOLD
+							{0, 0, 0, 0},
+							{0, 0, 0, 0},
+							{0, 0, 0, 0}
+						};
 
 int circle_points = 100;
-#define pi 3.142857
-
 GLint a=300,b=-300,flag=0,traffic_regulator=1,control_keyl,control_keyr;
 GLfloat red=0,blue=1,green=.3;
 GLfloat yr,xr;
@@ -29,6 +67,7 @@ void helpscreen();
 void menu();
 void *currentfont;
 
+
 void square()
 {
 	glPushMatrix();
@@ -39,45 +78,45 @@ void square()
 
 	if(xr == 0 && yr == 150 || xr == 150 && yr == 300 || xr == 300 && yr == 150 || score < 0)
     {
-        setFont(GLUT_BITMAP_TIMES_ROMAN_24);
-	glClearColor(0,0.5,0.5,1.0);/*background for cover page and grid */
-	glClear(GL_COLOR_BUFFER_BIT);
-	glColor3f(0,1,0);
-	drawstring(650.0,500.0,0.0,"You lost");
-	//glClearColor(0,0.5,0.5,1.0);/*background for cover page and grid */
-	//glClear(GL_COLOR_BUFFER_BIT);
-    choice = 0;
-    xr = 0;
-    yr = 0;
-    score = 505;
+		setFont(GLUT_BITMAP_TIMES_ROMAN_24);
+		glClearColor(0,0.5,0.5,1.0);/*background for cover page and grid */
+		glClear(GL_COLOR_BUFFER_BIT);
+		glColor3f(0,1,0);
+		drawstring(650.0,500.0,0.0,"You lost");
+		//glClearColor(0,0.5,0.5,1.0);/*background for cover page and grid */
+		//glClear(GL_COLOR_BUFFER_BIT);
+		choice = 0;
+		xr = 0;
+		yr = 0;
+		score = 505;
     }
     else if (xr == 0 && yr == 300)
     {
-    setFont(GLUT_BITMAP_TIMES_ROMAN_24);
-	glClearColor(0,0.5,0.5,1.0);/*background for cover page and grid */
-	glClear(GL_COLOR_BUFFER_BIT);
-	glColor3f(0,1,0);
-	drawstring(650.0,500.0,0.0,"You win!!!");
-	choice = 0;
-    xr = 0;
-    yr = 0;
-    score = 505;
+		setFont(GLUT_BITMAP_TIMES_ROMAN_24);
+		glClearColor(0,0.5,0.5,1.0);/*background for cover page and grid */
+		glClear(GL_COLOR_BUFFER_BIT);
+		glColor3f(0,1,0);
+		drawstring(650.0,500.0,0.0,"You win!!!");
+		choice = 0;
+		xr = 0;
+		yr = 0;
+		score = 505;
     }
-    else{
-            glBegin(GL_POLYGON);
-		glVertex2f(xr+450,yr+100);
-		glVertex2f(xr+500,yr+100);
-		glColor3f(0.8,0.8,0.8);
-		glVertex2f(xr+450,yr+150);
-		glVertex2f(xr+500,yr+150);
-		glColor3f(0.75,0.75,0.75);
-		glVertex2f(xr+450,yr+100);
-		glVertex2f(xr+450,yr+150);
-		glColor3f(0.8,0.8,0.8);
-		glVertex2f(xr+500,yr+100);
-		glVertex2f(xr+500,yr+150);
-
-	glEnd();
+    else
+	{
+		glBegin(GL_POLYGON);
+			glVertex2f(xr+450,yr+100);
+			glVertex2f(xr+500,yr+100);
+			glColor3f(0.8,0.8,0.8);
+			glVertex2f(xr+450,yr+150);
+			glVertex2f(xr+500,yr+150);
+			glColor3f(0.75,0.75,0.75);
+			glVertex2f(xr+450,yr+100);
+			glVertex2f(xr+450,yr+150);
+			glColor3f(0.8,0.8,0.8);
+			glVertex2f(xr+500,yr+100);
+			glVertex2f(xr+500,yr+150);
+        glEnd();
     }
 	glPopMatrix();
 }
@@ -156,7 +195,7 @@ void wumpus()
 				);
 			}
 		glEnd();
-		//2
+	//2
 		glColor3f(0.0,0.0,0.0);
 		glBegin(GL_TRIANGLE_FAN);
 		int x5 = 775;
@@ -223,7 +262,7 @@ void wumpus()
 			}
 		glEnd();
 
-		//3
+	//3
 		glColor3f(1.0,1.0,1.0);
 		glBegin(GL_TRIANGLE_FAN);
 		int x10 = 625;
@@ -454,14 +493,14 @@ void menu(int id)
 void display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
-	if(choice ==2)
+	if(choice ==2) //play
 	{
 		grid();
 		wumpus();
 		square();
 		glFlush();
 	}
-	else if(choice == 1)
+	else if(choice == 1) //learn
     {
         grid();
 		wumpus();
