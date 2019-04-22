@@ -3,47 +3,44 @@
 #include<stdio.h>
 //#include<GL/glut.h>
 #include<math.h>
+#include<stdbool.h>
+
 #define CIRCLE_RADIUS 0.15f
 #define pi 3.142857
 #define learning_rate 0.1
 #define discount 0.9
 
 //left top right bottom
-environment_matrix[15][4] = { {NULL, NULL, 0, NULL},
+//q[possible_states][actions]
+
+int q_matrix[16][4] = { {NULL, 0, 0, NULL},
 							{0, 0, 0, NULL},
-							{0, NULL, 0, NULL},
+							{0, 0, 0, NULL},
 							{0, 0, NULL, NULL},
-							{NULL, NULL, NULL, NULL},
-							{NULL, NULL, NULL, 0},
-							{NULL, NULL, NULL, NULL}, //WUMPUS
-							{NULL, 0, NULL, 0},
-							{0, 0, 0, 0}, //GOLD
-							{NULL, NULL, NULL, NULL},
-							{NULL, 0, 0, NULL},
+							{NULL, 0, 0, 0},
+							{0, 0, 0, 0},
+							{0, 0, 0, 0}, //WUMPUS
+							{0, 0, NULL, 0},
+							{NULL, 0, 0, 0}, //GOLD
+							{0, 0, 0, 0},
+							{0, 0, 0, 0},
 							{0, 0, NULL, 0},
 							{NULL, NULL, 0, 0}, //FINDS GOLD
-							{0, NULL, 0, NULL},
+							{0, NULL, 0, 0},
 							{0, NULL, 0, 0},
 							{0, NULL, NULL, 0}
 						};
-//q[possible_states][actions]
-int q_matrix[15][4] = { {0, 0, 0, 0},
-							{0, 0, 0, 0},
-							{0, 0, 0, 0},
-							{0, 0, 0, 0},
-							{0, 0, 0, 0},
-							{0, 0, 0, 0},
-							{0, 0, 0, 0}, //WUMPUS
-							{0, 0, 0, 0},
-							{0, 0, 0, 0}, //GOLD
-							{0, 0, 0, 0},
-							{0, 0, 0, 0},
-							{0, 0, 0, 0},
-							{0, 0, 0, 0}, //FINDS GOLD
-							{0, 0, 0, 0},
-							{0, 0, 0, 0},
-							{0, 0, 0, 0}
-						};
+
+int cur_pos = 0;
+int max =0;
+int next_pos = 0;
+int action = 0;
+int reward = 0;
+bool translate = true;
+int j=0, i = 0;
+
+int select_action(int);
+bool gameOver(int);
 
 int circle_points = 100;
 GLint a=300,b=-300,flag=0,traffic_regulator=1,control_keyl,control_keyr;
@@ -75,14 +72,14 @@ void square()
 	//lColor3f(1.0,0.0,0.0);
 	//glColor3f(0.8,0.8,0.8);
 	glColor3f(0.75,0.75,0.75);
-
+ if(choice ==2){
 	if(xr == 0 && yr == 150 || xr == 150 && yr == 300 || xr == 300 && yr == 150 || score < 0)
     {
 		setFont(GLUT_BITMAP_TIMES_ROMAN_24);
 		glClearColor(0,0.5,0.5,1.0);/*background for cover page and grid */
 		glClear(GL_COLOR_BUFFER_BIT);
 		glColor3f(0,1,0);
-		drawstring(650.0,500.0,0.0,"You lost");
+		drawstring(650.0,500.0,0.0,"You lost :-(");
 		//glClearColor(0,0.5,0.5,1.0);/*background for cover page and grid */
 		//glClear(GL_COLOR_BUFFER_BIT);
 		choice = 0;
@@ -96,7 +93,7 @@ void square()
 		glClearColor(0,0.5,0.5,1.0);/*background for cover page and grid */
 		glClear(GL_COLOR_BUFFER_BIT);
 		glColor3f(0,1,0);
-		drawstring(650.0,500.0,0.0,"You win!!!");
+		drawstring(650.0,500.0,0.0,"You win! :-)");
 		choice = 0;
 		xr = 0;
 		yr = 0;
@@ -105,19 +102,30 @@ void square()
     else
 	{
 		glBegin(GL_POLYGON);
+		  glColor3f(1.0,0.0,0.0);
 			glVertex2f(xr+450,yr+100);
 			glVertex2f(xr+500,yr+100);
-			glColor3f(0.8,0.8,0.8);
+			glColor3f(0.0,1.0,0.0);
+			//glColor3f(0.8,0.8,0.8);
 			glVertex2f(xr+450,yr+150);
 			glVertex2f(xr+500,yr+150);
-			glColor3f(0.75,0.75,0.75);
+			glColor3f(0.0,0.0,1.0);
+			//glColor3f(0.75,0.75,0.75);
 			glVertex2f(xr+450,yr+100);
 			glVertex2f(xr+450,yr+150);
-			glColor3f(0.8,0.8,0.8);
+			glColor3f(1.0,1.0,0.0);
+			//glColor3f(0.8,0.8,0.8);
 			glVertex2f(xr+500,yr+100);
 			glVertex2f(xr+500,yr+150);
-        glEnd();
+    glEnd();
     }
+ 	}
+	 if(choice ==1)
+	{
+
+
+	}
+	
 	glPopMatrix();
 }
 
@@ -348,7 +356,7 @@ void grid()
 	glPushMatrix();
 	//glScaled(40.0,40.0,0.0);
 	glClearColor(0,0.5,0.5,1.0); //grid background
-	glLineWidth(2.0);
+	glLineWidth(2.5);
 	glColor3f(0.0,0.0,0.0); //lines color
 	glBegin(GL_LINES);
 		glVertex2f(400, 50);
@@ -484,11 +492,41 @@ void menu(int id)
 		case 0: exit(0); break;
 		case 1: choice = 1;//learn();
 				break;
-		case 2: choice = 2;
+		case 2: choice = 2;//play
 				break;
 	}
 	glutPostRedisplay();
 }
+
+int select_action(int i)
+{
+	for(j = 0; j< 4; j++ )
+	{
+		if(q_matrix[i][j] != NULL) continue;
+		else
+		{
+			if(q_matrix[i][j] > max)
+			{
+				max = q_matrix[i][j];
+			}
+		}					
+	}return j;
+}
+
+bool gameOver(int cur_pos)
+{
+	if(cur_pos == 8)
+	{
+		for(i = 0; i<16; i++)
+		{
+			for(j=0; j<4; j++)
+			{
+				printf("%d", q_matrix[i][j]);
+			} printf("\n");
+		}return true;
+	}	  
+}
+
 
 void display(void)
 {
@@ -501,14 +539,47 @@ void display(void)
 		glFlush();
 	}
 	else if(choice == 1) //learn
-    {
-        grid();
+  {
+		grid();
 		wumpus();
 		square();
 		glFlush();
-    }
-    //mydisplay();
+
+		while(!gameOver(cur_pos))
+		{
+			action = select_action(cur_pos);
+
+			if(action == 0) //left
+			{
+				next_pos = cur_pos - 1; //new i value
+			}
+			if(action == 1) //top
+			{
+				next_pos = cur_pos +3; 
+			}
+			if(action == 2) //right
+			{
+				next_pos = cur_pos +1; 
+			}
+			if(action == 3) //bottom
+			{
+				next_pos = cur_pos - 3; 
+			}
+			
+			if(next_pos == 4 || next_pos == 6 || next_pos == 9)
+			{ reward = -1000;
+				cur_pos = 0;
+				translate = true;
+			}
+			else reward = -1;
+			
+			q_matrix[cur_pos][action] = q_matrix[cur_pos][action] + learning_rate * ( reward + 1*(q_matrix[next_pos][action]) - q_matrix[cur_pos][action] );
+			
+			cur_pos = next_pos;
+		}
+  }
 }
+
 
 void control() //not used yet
 {
