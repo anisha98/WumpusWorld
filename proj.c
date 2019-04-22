@@ -72,7 +72,7 @@ void square()
 	//lColor3f(1.0,0.0,0.0);
 	//glColor3f(0.8,0.8,0.8);
 	glColor3f(0.75,0.75,0.75);
- if(choice ==2){
+  if(choice ==2){
 	if(xr == 0 && yr == 150 || xr == 150 && yr == 300 || xr == 300 && yr == 150 || score < 0)
     {
 		setFont(GLUT_BITMAP_TIMES_ROMAN_24);
@@ -608,52 +608,108 @@ void myKeyboard( unsigned char key, int x, int y )
 				mydisplay();
 			}
 			break;
+
+		/*	
 		case GLUT_KEY_RIGHT:
-			yr = yr+0;
-			if(score > 0)
-			{
-				if(xr < 450)
-				{
-					xr = xr+150;
-					score = score - 50;
-				}
-        	}
-        	//if(xr == 0 && yr == 150)
-        	glutPostRedisplay();
-        	break;
+							yr = yr+0;
+							if(score > 0)
+							{
+								if(xr < 450)
+								{
+									xr = xr+150;
+									score = score - 50;
+								}
+							}
+									//if(xr == 0 && yr == 150)
+							glutPostRedisplay();
+							break;
     	case GLUT_KEY_LEFT:
-			yr = yr+0;
-			if(score >0)
-			{
-				if(xr > 0)
-					xr = xr-150;
-					score = score - 50;
-			}
-       		glutPostRedisplay();
-        	break;
+							yr = yr+0;
+							if(score >0)
+							{
+								if(xr > 0)
+									xr = xr-150;
+									score = score - 50;
+							}
+							glutPostRedisplay();
+							break;
     	case GLUT_KEY_UP:
-			xr = xr+0;
-			if(score >0)
-			{
-				if(yr < 450)
-					yr = yr+150;
-					score = score - 50;
-			}
-			glutPostRedisplay();
-			break;
+							xr = xr+0;
+							if(score >0)
+							{
+								if(yr < 450)
+									yr = yr+150;
+									score = score - 50;
+							}
+							glutPostRedisplay();
+							break;
     	case GLUT_KEY_DOWN:
-			xr = xr+0;
-			if(score >0)
-			{
-				if(yr > 0)
-					yr = yr-150;
-					score = score -50;
-			}
-			glutPostRedisplay();
-			break;
+							xr = xr+0;
+							if(score >0)
+							{
+								if(yr > 0)
+									yr = yr-150;
+									score = score -50;
+							}
+							glutPostRedisplay();
+							break;
+							*/
 		default:
-			break;
+							break;
 	}
+}
+
+void mySpecial(int key, int x, int y)
+{
+	switch(key)
+	{		
+			case GLUT_KEY_RIGHT:
+							yr = yr+0;
+							if(score > 0)
+							{
+								if(xr < 450)
+								{
+									xr = xr+150;
+									score = score - 50;
+								}
+							}
+									//if(xr == 0 && yr == 150)
+							glutPostRedisplay();
+							break;
+    	case GLUT_KEY_LEFT:
+							yr = yr+0;
+							if(score >0)
+							{
+								if(xr > 0)
+									xr = xr-150;
+									score = score - 50;
+							}
+							glutPostRedisplay();
+							break;
+    	case GLUT_KEY_UP:
+							xr = xr+0;
+							if(score >0)
+							{
+								if(yr < 450)
+									yr = yr+150;
+									score = score - 50;
+							}
+							glutPostRedisplay();
+							break;
+    	case GLUT_KEY_DOWN:
+							xr = xr+0;
+							if(score >0)
+							{
+								if(yr > 0)
+									yr = yr-150;
+									score = score -50;
+							}
+							glutPostRedisplay();
+							break;
+			default:
+							break;
+	}						
+
 }
 
 void mydisplay(void)
@@ -702,6 +758,7 @@ int main(int argc, char* argv[])
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 	glutDisplayFunc(mydisplay);
 	glutKeyboardFunc(myKeyboard);
+	glutSpecialFunc(mySpecial);
 	//glutMouseFunc(myMouse);
 	myinit();
 	glutMainLoop();
