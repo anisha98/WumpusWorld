@@ -13,35 +13,34 @@
 //left top right bottom
 //q[possible_states][actions]
 
-int q_matrix[16][4] = { {NULL, 0, 0, NULL},
-							{0, 0, 0, NULL},
-							{0, 0, 0, NULL},
-							{0, 0, NULL, NULL},
-							{NULL, 0, 0, 0},
+float q_matrix[16][4] = { {-10000, 0, 0, -10000},
+							{0, 0, 0, -10000},
+							{0, 0, 0, -10000},
+							{0, 0, -10000, -10000},
+							{-10000, 0, 0, 0},
 							{0, 0, 0, 0},
 							{0, 0, 0, 0}, //WUMPUS
-							{0, 0, NULL, 0},
-							{NULL, 0, 0, 0}, //GOLD
+							{0, 0, -10000, 0},
+							{-10000, 0, 0, 0}, //GOLD
 							{0, 0, 0, 0},
 							{0, 0, 0, 0},
-							{0, 0, NULL, 0},
-							{NULL, NULL, 0, 0}, //FINDS GOLD
-							{0, NULL, 0, 0},
-							{0, NULL, 0, 0},
-							{0, NULL, NULL, 0}
+							{0, 0, -10000, 0},
+							{-10000, -10000, 0, 0}, //FINDS GOLD
+							{0, -10000, 0, 0},
+							{0, -10000, 0, 0},
+							{0, -10000, -10000, 0}
 						};
 
 int cur_pos = 0;
-int max =0;
+float max =0;
 int next_pos = 0;
 int action = 0;
 int reward = 0;
 bool translate = true;
-int j=0, i = 0;
+int j=0, i = 0, pos = 0, tx = 0, ty = 0;
 
 int select_action(int);
 bool gameOver(int);
-
 int circle_points = 100;
 GLint a=300,b=-300,flag=0,traffic_regulator=1,control_keyl,control_keyr;
 GLfloat red=0,blue=1,green=.3;
@@ -64,71 +63,150 @@ void helpscreen();
 void menu();
 void *currentfont;
 
-
 void square()
 {
 	glPushMatrix();
 	//glScaled(40.0,40.0,0.0);
-	//lColor3f(1.0,0.0,0.0);
-	//glColor3f(0.8,0.8,0.8);
 	glColor3f(0.75,0.75,0.75);
-  if(choice ==2){
-	if(xr == 0 && yr == 150 || xr == 150 && yr == 300 || xr == 300 && yr == 150 || score < 0)
-    {
-		setFont(GLUT_BITMAP_TIMES_ROMAN_24);
-		glClearColor(0,0.5,0.5,1.0);/*background for cover page and grid */
-		glClear(GL_COLOR_BUFFER_BIT);
-		glColor3f(0,1,0);
-		drawstring(650.0,500.0,0.0,"You lost :-(");
-		//glClearColor(0,0.5,0.5,1.0);/*background for cover page and grid */
-		//glClear(GL_COLOR_BUFFER_BIT);
-		choice = 0;
-		xr = 0;
-		yr = 0;
-		score = 505;
-    }
-    else if (xr == 0 && yr == 300)
-    {
-		setFont(GLUT_BITMAP_TIMES_ROMAN_24);
-		glClearColor(0,0.5,0.5,1.0);/*background for cover page and grid */
-		glClear(GL_COLOR_BUFFER_BIT);
-		glColor3f(0,1,0);
-		drawstring(650.0,500.0,0.0,"You win! :-)");
-		choice = 0;
-		xr = 0;
-		yr = 0;
-		score = 505;
-    }
-    else
+    if(choice ==2)  //play
 	{
-		glBegin(GL_POLYGON);
-		  glColor3f(1.0,0.0,0.0);
-			glVertex2f(xr+450,yr+100);
-			glVertex2f(xr+500,yr+100);
-			glColor3f(0.0,1.0,0.0);
-			//glColor3f(0.8,0.8,0.8);
-			glVertex2f(xr+450,yr+150);
-			glVertex2f(xr+500,yr+150);
-			glColor3f(0.0,0.0,1.0);
-			//glColor3f(0.75,0.75,0.75);
-			glVertex2f(xr+450,yr+100);
-			glVertex2f(xr+450,yr+150);
-			glColor3f(1.0,1.0,0.0);
-			//glColor3f(0.8,0.8,0.8);
-			glVertex2f(xr+500,yr+100);
-			glVertex2f(xr+500,yr+150);
-    glEnd();
-    }
+		if(xr == 0 && yr == 150 || xr == 150 && yr == 300 || xr == 300 && yr == 150 || score < 0)
+        {
+			setFont(GLUT_BITMAP_TIMES_ROMAN_24);
+			glClearColor(0,0.5,0.5,1.0);/*background for cover page and grid */
+			glClear(GL_COLOR_BUFFER_BIT);
+			drawstring(650.0,500.0,0.0,"You lost :-(");
+			choice = 0;
+			xr = 0;
+			yr = 0;
+			score = 505;
+        }
+        else if (xr == 0 && yr == 300)
+        { 
+			setFont(GLUT_BITMAP_TIMES_ROMAN_24);
+			glClearColor(0,0.5,0.5,1.0);/*background for cover page and grid */
+			glClear(GL_COLOR_BUFFER_BIT);
+			glColor3f(0,1,0);
+			drawstring(450.0,350.0,0.0,"You win! :-)");
+			choice = 0;
+			xr = 0;
+			yr = 0;
+			score = 505;
+        }
+        else
+	    {   
+			
+			glBegin(GL_POLYGON);
+				glColor3f(1.0,0.0,0.0);
+				glVertex2f(xr+450,yr+100);
+				glVertex2f(xr+500,yr+100);
+				glColor3f(0.0,1.0,0.0);
+				glVertex2f(xr+450,yr+150);
+				glVertex2f(xr+500,yr+150);
+				glColor3f(0.0,0.0,1.0);
+				glVertex2f(xr+450,yr+100);
+				glVertex2f(xr+450,yr+150);
+				glColor3f(1.0,1.0,0.0);
+				glVertex2f(xr+500,yr+100);
+				glVertex2f(xr+500,yr+150);
+			glEnd();
+			
+        }
  	}
-	 if(choice ==1)
+	if(choice ==1)  //learn
 	{
-
-
+		
+		if(action ==0)
+		{
+			tx = -150.0;
+			ty = 0.0;
+			glPushMatrix();
+			glTranslatef(tx, ty, 0);
+			glBegin(GL_POLYGON);
+			glColor3f(1.0,0.0,0.0);
+			glVertex2f(450,100);
+			glVertex2f(500,100);
+			glColor3f(0.0,1.0,0.0);
+			glVertex2f(450,150);
+			glVertex2f(500,150);
+			glColor3f(0.0,0.0,1.0);
+			glVertex2f(450,100);
+			glVertex2f(450,150);
+			glColor3f(1.0,1.0,0.0);
+			glVertex2f(500,100);
+			glVertex2f(500,150);
+			glEnd();
+			glPopMatrix();
+		}
+		if(action ==1)
+		{
+			tx = 0.0;
+			ty = 150.0;
+			glPushMatrix();
+			glTranslatef(tx, ty, 0);
+			glBegin(GL_POLYGON);
+			glColor3f(1.0,0.0,0.0);
+			glVertex2f(450,100);
+			glVertex2f(500,100);
+			glColor3f(0.0,1.0,0.0);
+			glVertex2f(450,150);
+			glVertex2f(500,150);
+			glColor3f(0.0,0.0,1.0);
+			glVertex2f(450,100);
+			glVertex2f(450,150);
+			glColor3f(1.0,1.0,0.0);
+			glVertex2f(500,100);
+			glVertex2f(500,150);
+			glEnd();
+			glPopMatrix();
+		}
+		if(action ==2)
+		{
+			tx = 150.0;
+			ty = 0.0;
+			glPushMatrix();
+			glTranslatef(tx, ty, 0);
+			glBegin(GL_POLYGON);
+			glColor3f(1.0,0.0,0.0);
+			glVertex2f(450,100);
+			glVertex2f(500,100);
+			glColor3f(0.0,1.0,0.0);
+			glVertex2f(450,150);
+			glVertex2f(500,150);
+			glColor3f(0.0,0.0,1.0);
+			glVertex2f(450,100);
+			glVertex2f(450,150);
+			glColor3f(1.0,1.0,0.0);
+			glVertex2f(500,100);
+			glVertex2f(500,150);
+			glEnd();
+			glPopMatrix();
+		}
+		if(action ==3)
+		{
+			tx = 0.0;
+			ty = -150.0;
+			glPushMatrix();
+			glTranslatef(tx, ty, 0);
+			glBegin(GL_POLYGON);
+			glColor3f(1.0,0.0,0.0);
+			glVertex2f(450,100);
+			glVertex2f(500,100);
+			glColor3f(0.0,1.0,0.0);
+			glVertex2f(450,150);
+			glVertex2f(500,150);
+			glColor3f(0.0,0.0,1.0);
+			glVertex2f(450,100);
+			glVertex2f(450,150);
+			glColor3f(1.0,1.0,0.0);
+			glVertex2f(500,100);
+			glVertex2f(500,150);
+			glEnd();
+			glPopMatrix();
+		}
 	}
-	
-	glPopMatrix();
+	glFlush();
 }
-
 
 void wumpus()
 {
@@ -384,7 +462,7 @@ void grid()
 		glVertex2f(850,50);
 		glVertex2f(850,650);
 	glEnd();
-	glPopMatrix();
+	glPopMatrix(); 
 }
 
 
@@ -410,7 +488,6 @@ void frontscreen(void) //ENTER SCREEN
 	//glClearColor(0.15,0.1,0.01,0);/*background for cover page*/
 	glClearColor(1.0,1.0,1.0,1.0); //doesnt matter
 	glClear(GL_COLOR_BUFFER_BIT);
-	//background color
 	glBegin(GL_POLYGON); //1346, 728
 		glColor3f(1.0,0.0,0.0);
 		glVertex3f(0.0,0.0,0.0);
@@ -502,15 +579,14 @@ int select_action(int i)
 {
 	for(j = 0; j< 4; j++ )
 	{
-		if(q_matrix[i][j] != NULL) continue;
-		else
-		{
-			if(q_matrix[i][j] > max)
+		if(q_matrix[i][j] != -10000) 
+		{	if(q_matrix[i][j] > max)
 			{
 				max = q_matrix[i][j];
+				pos = j;
 			}
 		}					
-	}return j;
+	}return pos;
 }
 
 bool gameOver(int cur_pos)
@@ -521,16 +597,17 @@ bool gameOver(int cur_pos)
 		{
 			for(j=0; j<4; j++)
 			{
-				printf("%d", q_matrix[i][j]);
-			} printf("\n");
+				printf("%f     ", q_matrix[i][j]);
+			}  printf("\n");
 		}return true;
-	}	  
+	}return false;
+	  
 }
-
 
 void display(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
+
 	if(choice ==2) //play
 	{
 		grid();
@@ -569,93 +646,35 @@ void display(void)
 			if(next_pos == 4 || next_pos == 6 || next_pos == 9)
 			{ reward = -1000;
 				cur_pos = 0;
-				translate = true;
+				//translate = true;
 			}
 			else reward = -1;
 			
 			q_matrix[cur_pos][action] = q_matrix[cur_pos][action] + learning_rate * ( reward + 1*(q_matrix[next_pos][action]) - q_matrix[cur_pos][action] );
 			
 			cur_pos = next_pos;
-		}
+		}	
   }
-}
-
-
-void control() //not used yet
-{
-	if(control_keyl!='l'||control_keyr!='r')
-	{
-		if(control_keyl=='l')
-      		a=a+6;
-		if(control_keyr=='r')
-	 		b=b-6;
-	}
 }
 
 void myKeyboard( unsigned char key, int x, int y )
 {
 	switch(key)
 	{
-		case 13:
+		case 13: //Ascii of 'enter' key is 13
 			if(flag==1)
 			{
 				flag=2;
 				mydisplay();
 			}
-			if(flag==0) //Ascii of 'enter' key is 13
+			if(flag==0) 
 			{
 				flag=1;
 				mydisplay();
 			}
 			break;
-
-		/*	
-		case GLUT_KEY_RIGHT:
-							yr = yr+0;
-							if(score > 0)
-							{
-								if(xr < 450)
-								{
-									xr = xr+150;
-									score = score - 50;
-								}
-							}
-									//if(xr == 0 && yr == 150)
-							glutPostRedisplay();
-							break;
-    	case GLUT_KEY_LEFT:
-							yr = yr+0;
-							if(score >0)
-							{
-								if(xr > 0)
-									xr = xr-150;
-									score = score - 50;
-							}
-							glutPostRedisplay();
-							break;
-    	case GLUT_KEY_UP:
-							xr = xr+0;
-							if(score >0)
-							{
-								if(yr < 450)
-									yr = yr+150;
-									score = score - 50;
-							}
-							glutPostRedisplay();
-							break;
-    	case GLUT_KEY_DOWN:
-							xr = xr+0;
-							if(score >0)
-							{
-								if(yr > 0)
-									yr = yr-150;
-									score = score -50;
-							}
-							glutPostRedisplay();
-							break;
-							*/
 		default:
-							break;
+			break;
 	}
 }
 
@@ -731,19 +750,6 @@ void myinit()
 	gluOrtho2D(0.0,1346.0,0.0,728.0);
 }
 
-void update(int value) //not used
-{
-	a=a-6;
-	b=b+6;
-	control();
-	/*making day to night*/
-	if(blue!=0&&green!=0)
-	{
-		blue-=.004;green-=.004;
-	}
-	glutPostRedisplay();
-}
-
 int main(int argc, char* argv[])
 {
 	glutInit(&argc, argv);
@@ -759,7 +765,6 @@ int main(int argc, char* argv[])
 	glutDisplayFunc(mydisplay);
 	glutKeyboardFunc(myKeyboard);
 	glutSpecialFunc(mySpecial);
-	//glutMouseFunc(myMouse);
 	myinit();
 	glutMainLoop();
 }
