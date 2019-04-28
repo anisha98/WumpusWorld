@@ -1,14 +1,13 @@
-#include<GLUT/glut.h>
-#include<OpenGL/gl.h>
+//#include<GLUT/glut.h>
+//#include<OpenGL/gl.h>
 #include<stdio.h>
-//#include<GL/glut.h>
+#include<GL/glut.h>
 #include<math.h>
 #include<stdbool.h>
 
 #define CIRCLE_RADIUS 0.15f
 #define pi 3.142857
-#define learning_rate 0.1
-#define discount 0.9
+#define discount 1
 
 //left top right bottom
 //q[possible_states][actions]
@@ -16,29 +15,29 @@
 float q_matrix[16][4] = { {-10000, 0, 0, -10000},
 							{0, 0, 0, -10000},
 							{0, 0, 0, -10000},
-							{0, 0, -10000, -10000},
+							{0, -10000, 0, -10000},
 							{-10000, 0, 0, 0},
-							{0, 0, 0, 0},
+							{0, 0, 0,0},
 							{0, 0, 0, 0}, //WUMPUS
-							{0, 0, -10000, 0},
-							{-10000, 0, 0, 0}, //GOLD
+							{0, -10000, 0, 0},
+							{10000, 10000, 10000, 10000}, //GOLD
 							{0, 0, 0, 0},
 							{0, 0, 0, 0},
+							{0, -10000, 0, 0},
+							{-10000, 0, -10000, 0}, //FINDS GOLD
 							{0, 0, -10000, 0},
-							{-10000, -10000, 0, 0}, //FINDS GOLD
-							{0, -10000, 0, 0},
-							{0, -10000, 0, 0},
-							{0, -10000, -10000, 0}
+							{0, 0, -10000, 0},
+                            {0, -10000, -10000, 0}
 						};
 
 int cur_pos = 0;
-float max =0;
+float max =-1;
 int next_pos = 0;
 int action = 0;
-int reward = 0;
+float reward = -0.04;
 bool translate = true;
 int j=0, i = 0, pos = 0, tx = 0, ty = 0;
-
+float learning_rate = 0.5;
 int select_action(int);
 bool gameOver(int);
 int circle_points = 100;
@@ -47,6 +46,7 @@ GLfloat red=0,blue=1,green=.3;
 GLfloat yr,xr;
 int score = 505;
 int choice = 0;
+int iter = 0;
 
 GLfloat p=0,q=0,r=0;
 void mydisplay();
@@ -62,7 +62,7 @@ void control();
 void helpscreen();
 void menu();
 void *currentfont;
-
+int count = 0;
 void square()
 {
 	glPushMatrix();
@@ -82,7 +82,7 @@ void square()
 			score = 505;
         }
         else if (xr == 0 && yr == 300)
-        { 
+        {
 			setFont(GLUT_BITMAP_TIMES_ROMAN_24);
 			glClearColor(0,0.5,0.5,1.0);/*background for cover page and grid */
 			glClear(GL_COLOR_BUFFER_BIT);
@@ -94,8 +94,8 @@ void square()
 			score = 505;
         }
         else
-	    {   
-			
+	    {
+
 			glBegin(GL_POLYGON);
 				glColor3f(1.0,0.0,0.0);
 				glVertex2f(xr+450,yr+100);
@@ -110,12 +110,12 @@ void square()
 				glVertex2f(xr+500,yr+100);
 				glVertex2f(xr+500,yr+150);
 			glEnd();
-			
+
         }
  	}
 	if(choice ==1)  //learn
 	{
-		
+
 		if(action ==0)
 		{
 			tx = -150.0;
@@ -462,7 +462,7 @@ void grid()
 		glVertex2f(850,50);
 		glVertex2f(850,650);
 	glEnd();
-	glPopMatrix(); 
+	glPopMatrix();
 }
 
 
@@ -577,31 +577,40 @@ void menu(int id)
 
 int select_action(int i)
 {
+    printf("The value of i %d \n",i);
+    printf("Iteration no %d \n" , iter);
+    iter++;
 	for(j = 0; j< 4; j++ )
 	{
-		if(q_matrix[i][j] != -10000) 
+		if(q_matrix[i][j] > -10000)
 		{	if(q_matrix[i][j] > max)
 			{
+			    printf("Matrix i = %d , j = %d value is %f \n",i,j,q_matrix[i][j]);
+				printf("Before max : %f \n",max);
 				max = q_matrix[i][j];
-				pos = j;
+				printf("After max : %f \n",max);
 			}
-		}					
-	}return pos;
+		}
+	}
+	for(j = 0; j< 4; j++ )
+	{
+	    if(q_matrix[i][j] == max)
+        {
+            printf("pos = %d \n",j);
+            max = -1;
+            count ++;
+            return j;
+        }
+	}
 }
 
 bool gameOver(int cur_pos)
 {
 	if(cur_pos == 8)
 	{
-		for(i = 0; i<16; i++)
-		{
-			for(j=0; j<4; j++)
-			{
-				printf("%f     ", q_matrix[i][j]);
-			}  printf("\n");
-		}return true;
+        return true;
 	}return false;
-	  
+
 }
 
 void display(void)
@@ -622,38 +631,52 @@ void display(void)
 		square();
 		glFlush();
 
-		while(!gameOver(cur_pos))
+		while(!gameOver(cur_pos) )
 		{
 			action = select_action(cur_pos);
-
+            //printf("%d \n",action);
 			if(action == 0) //left
 			{
 				next_pos = cur_pos - 1; //new i value
 			}
-			if(action == 1) //top
+			if(action == 1) //right
 			{
-				next_pos = cur_pos +3; 
+				next_pos = cur_pos +1;
 			}
-			if(action == 2) //right
+			if(action == 2) //top
 			{
-				next_pos = cur_pos +1; 
+				next_pos = cur_pos +4;
 			}
 			if(action == 3) //bottom
 			{
-				next_pos = cur_pos - 3; 
+				next_pos = cur_pos - 4;
 			}
-			
+
 			if(next_pos == 4 || next_pos == 6 || next_pos == 9)
-			{ reward = -1000;
-				cur_pos = 0;
+			{   //reward = -1000;
+				//cur_pos = 0;
+				next_pos = 0;
+				learning_rate = 0;
+				q_matrix[cur_pos][action] = -10000;
 				//translate = true;
 			}
-			else reward = -1;
-			
-			q_matrix[cur_pos][action] = q_matrix[cur_pos][action] + learning_rate * ( reward + 1*(q_matrix[next_pos][action]) - q_matrix[cur_pos][action] );
-			
+			else {
+			learning_rate = 0.5;
+			}
+			printf("action = %d \n",action);
+			int maxa = -1;
+			for(int i1 = 0;i1<4;i1++)
+            {
+                if(q_matrix[next_pos][i1] > maxa)
+                {
+                    maxa = q_matrix[next_pos][i1];
+                    pos = i1;
+                }
+            }
+			q_matrix[cur_pos][action] = q_matrix[cur_pos][action] + learning_rate * ( reward + 1*(q_matrix[next_pos][pos]) - q_matrix[cur_pos][action] );
+            printf("Value = %f \n",q_matrix[cur_pos][action]);
 			cur_pos = next_pos;
-		}	
+		}
   }
 }
 
@@ -667,7 +690,7 @@ void myKeyboard( unsigned char key, int x, int y )
 				flag=2;
 				mydisplay();
 			}
-			if(flag==0) 
+			if(flag==0)
 			{
 				flag=1;
 				mydisplay();
@@ -681,7 +704,7 @@ void myKeyboard( unsigned char key, int x, int y )
 void mySpecial(int key, int x, int y)
 {
 	switch(key)
-	{		
+	{
 			case GLUT_KEY_RIGHT:
 							yr = yr+0;
 							if(score > 0)
@@ -727,7 +750,7 @@ void mySpecial(int key, int x, int y)
 							break;
 			default:
 							break;
-	}						
+	}
 
 }
 
