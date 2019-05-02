@@ -1,20 +1,17 @@
 #include<GLUT/glut.h>
 #include<OpenGL/gl.h>
-#include<stdio.h>
 //#include<GL/glut.h>
 #include<math.h>
 #include<stdbool.h>
+#include<time.h>
 #include<unistd.h>
 
 #define CIRCLE_RADIUS 0.15f
 #define pi 3.142857
 #define discount 1
 
-//left top right bottom
-//q[possible_states][actions]
-int ctr =0;
-
 void final_page();
+int bl = 0;
 
 float q_matrix[16][4] = { {-10000, 0, 0, -10000},
 							{0, 0, 0, -10000},
@@ -31,7 +28,7 @@ float q_matrix[16][4] = { {-10000, 0, 0, -10000},
 							{-10000, 0, -10000, 0}, //FINDS GOLD
 							{0, 0, -10000, 0},
 							{0, 0, -10000, 0},
-							{0, -10000, -10000, 0}
+                            {0, -10000, -10000, 0}
 						};
 int box = 0;
 int cur_pos = 0;
@@ -39,24 +36,21 @@ float max =-1;
 int next_pos = 0;
 int action = 1;
 float reward = -0.04;
-
 void translate();
 int j=0, i = 0, pos = 0, tx = 0, ty = 0;
 float learning_rate = 0.5;
 int select_action(int);
 bool gameOver(int);
 int circle_points = 100;
-
-int action_arr[200] ;
-int a = 0, b = 0, c = 0;
-
 GLint a=0,b=0,flag=0;
 GLfloat red=0,blue=1,green=.3;
 GLfloat yr,xr;
 int score = 505;
 int choice = 0;
 int iter = 0;
-int flag = 0;
+
+int last_death;
+
 
 GLfloat p=0,q=0,r=0;
 void mydisplay();
@@ -72,50 +66,23 @@ void control();
 void helpscreen();
 void menu();
 void *currentfont;
-
-void translate();
-
-int count = 0;
 void delay(unsigned int mseconds);
-void move_square(int tx,int ty,int action);
+void move_square(int tx,int ty);
 int count = 0;
 int action_array[200];
 int ctrl = 0;
-/*
-void drawPoint(int x, int y)
-{
-    glPointSize(7.0);
-    glColor3f(0.0f, 0.0f, 1.0f);
-    glBegin(GL_POINTS);
-    glVertex2i(x, y);
-    glEnd();
-}
-void delay(unsigned int mseconds)
-{
-    clock_t goal = mseconds + clock();
-    while (goal > clock())
-        ;
-}
-void translatePoint()
-{
-    while (1) {
-        glClear(GL_COLOR_BUFFER_BIT);
-        drawPoint(tx, ty);
-        glFlush();
-        delay(50000);
-    }
-}
-*/
+
 int l = 0;
 int o = 450;
 int o1 = 500;
 int o2 = 100;
 int o3 = 150;
-void move_square(tx,ty,action)
-{
- glClear(GL_COLOR_BUFFER_BIT);
 
+void move_square(tx,ty)
+{
+ 		glClear(GL_COLOR_BUFFER_BIT);
         grid();
+		
         wumpus();
 
         glBegin(GL_POLYGON);
@@ -124,7 +91,8 @@ void move_square(tx,ty,action)
 			o1 = o1+tx;
 			o2 = o2+ty;
 			o3 = o3+ty;
-			delay(10000);
+			sleep(10);
+			//delay(10000);
 			glVertex2f(o,o2);
 			glVertex2f(o1,o2);
 			glColor3f(0.0,1.0,0.0);
@@ -139,12 +107,14 @@ void move_square(tx,ty,action)
 			glEnd();
         glFlush();
 }
+/*
 void delay(unsigned int mseconds)
 {
     clock_t goal = mseconds + clock();
     while (goal > clock())
         ;
 }
+*/
 
 void final_page()
 {
@@ -284,7 +254,7 @@ void final_page()
 		glVertex2f(550,650);
 		glVertex2f(550,500);
 		glVertex2f(400,650);
-		//1
+		//13
 		glVertex2f(550,500);
 		glVertex2f(700,500);
 		glVertex2f(700,650);
@@ -294,7 +264,7 @@ void final_page()
 		glVertex2f(700,650);
 		glVertex2f(700,500);
 		glVertex2f(550,650);
-		//2
+		//14
 		glVertex2f(700,500);
 		glVertex2f(850,500);
 		glVertex2f(850,650);
@@ -304,7 +274,7 @@ void final_page()
 		glVertex2f(850,650);
 		glVertex2f(850,500);
 		glVertex2f(700,650);
-		//3
+		//15
 		glVertex2f(850,500);
 		glVertex2f(1000,500);
 		glVertex2f(1000,650);
@@ -316,75 +286,89 @@ void final_page()
 		glVertex2f(850,650);
 	glEnd();
 	glPopMatrix();
-	//glColor3f(1,1,1);
+	
 	//float n = q_matrix[0][0];
     //char buffer[10]={'\0'};
     //sprintf(buffer, "%f", n);
-    //drawstring(650, 650 ,0, "hii");
+    
+	//TODO
+	for(int l = 0; l<16; l++)
+	{
+		for(int m = 0; m<4; m++)
+		{
+			float num = q_matrix[l][m];
+			char snum[5];
+			ftoa(num, snum, 10);    
+			drawstring(450, 650 ,0, snum);
+		}
+	}
+	
 }
 
 void translate()
 {
-    /*
-    for(int i = 0;i<ctrl;i++)
-    {
-        printf("%d  ",action_array[i]);
-    }
-    printf("\n"); */
-    glPushMatrix();
-	glColor3f(0.75,0.75,0.75);
-    if(choice ==1 )  //learn
-	{
-    for(int z = 0;z < ctrl;z++){
-
-		if(action_array[z] ==0 )
+	printf("In translate\n");
+    //for(int z = 0; z < ctrl; z++) //till end of action array
+	for(int z = last_death+25; z < ctrl; z++) //till end of action array
 		{
-			tx = -150.0;
-			ty = 0.0;
-			glPushMatrix();
-			move_square(tx,ty,action_array[z]);
-			delay(10000);
-			glPopMatrix();
-		}
-		else if (action_array[z] ==1 )
-		{
-			tx = 150.0;
-			ty = 0.0;
-			glPushMatrix();
-			move_square(tx,ty,1);
-            delay(10000);
-			glPopMatrix();
-		}
-		else if(action_array[z] ==2 )
-		{
-			tx = 0.0;
-			ty = 150.0;
-			glPushMatrix();
-			move_square(tx,ty,2);
-			delay(10000);
-			glPopMatrix();
-		}
-		else if( action_array[z] ==3 )
-		{
-			tx = 0.0;
-			ty = -150.0;
-			glPushMatrix();
-            move_square(tx,ty,3);
-            delay(10000);
-			glPopMatrix();
-		}
-		 else if( action_array[z] == 10)
-        {
-            o = 450;
-            o1 = 500;
-            o2 = 100;
-            o3 = 150;
-            delay(10000);
-        }
+			printf("z_value: %d\n", z);
+			if(action_array[z] ==0 )
+			{
+				tx = -150.0;
+				ty = 0.0;
+				//glPushMatrix();
+				move_square(tx,ty);
+				printf("here: %d", bl++);
+				//sleep(10);
+				//delay(10000);
+				//glPopMatrix();
+			}
+			else if (action_array[z] ==1 )
+			{
+				tx = 150.0;
+				ty = 0.0;
+				//glPushMatrix();
+				move_square(tx,ty);
+				printf("here: %d", bl++);
+				//sleep(10);
+				//delay(10000);
+				//glPopMatrix();
+			}
+			else if(action_array[z] ==2 )
+			{
+				tx = 0.0;
+				ty = 150.0;
+				//glPushMatrix();
+				move_square(tx,ty);
+				printf("here: %d", bl++);
+				//sleep(10);
+				//delay(10000);
+				//glPopMatrix();
+			}
+			else if( action_array[z] ==3 )
+			{
+				tx = 0.0;
+				ty = -150.0;
+				//glPushMatrix();
+				move_square(tx,ty);
+				printf("here: %d", bl++);
+				//sleep(10);
+				//delay(10000);
+				//glPopMatrix();
+			}
+			else if( action_array[z] == 10) //death
+			{
+				o = 450;
+				o1 = 500;
+				o2 = 100;
+				o3 = 150;
+				move_square(0,0);
+				printf("here: %d", bl++);
+				//sleep(10);
+				//delay(10000);
+			}
 		glFlush();
-	}
-	choice = 3;
-	}
+	}choice = 3;
 }
 
 void square()
@@ -437,99 +421,6 @@ void square()
 
         }
  	}
-	if(choice ==1)  //learn
-	{
-		sleep(1);
-		if(action ==0) //left
-		{
-			tx = -150.0;
-			ty = 0.0;
-			glPushMatrix();
-			glTranslatef(tx, ty, 0);
-			glBegin(GL_POLYGON);
-			glColor3f(1.0,0.0,0.0);
-			glVertex2f(450,100);
-			glVertex2f(500,100);
-			glColor3f(0.0,1.0,0.0);
-			glVertex2f(450,150);
-			glVertex2f(500,150);
-			glColor3f(0.0,0.0,1.0);
-			glVertex2f(450,100);
-			glVertex2f(450,150);
-			glColor3f(1.0,1.0,0.0);
-			glVertex2f(500,100);
-			glVertex2f(500,150);
-			glEnd();
-			glPopMatrix();
-		}
-		if(action ==1) //right
-		{
-			tx = 150.0;
-			ty = 0.0;
-			glPushMatrix();
-			glTranslatef(tx, ty, 0);
-			glBegin(GL_POLYGON);
-			glColor3f(1.0,0.0,0.0);
-			glVertex2f(450,100);
-			glVertex2f(500,100);
-			glColor3f(0.0,1.0,0.0);
-			glVertex2f(450,150);
-			glVertex2f(500,150);
-			glColor3f(0.0,0.0,1.0);
-			glVertex2f(450,100);
-			glVertex2f(450,150);
-			glColor3f(1.0,1.0,0.0);
-			glVertex2f(500,100);
-			glVertex2f(500,150);
-			glEnd();
-			glPopMatrix();
-		}
-		if(action ==2) //top
-		{
-			tx = 0.0;
-			ty = 150.0;
-			glPushMatrix();
-			glTranslatef(tx, ty, 0);
-			glBegin(GL_POLYGON);
-			glColor3f(1.0,0.0,0.0);
-			glVertex2f(450,100);
-			glVertex2f(500,100);
-			glColor3f(0.0,1.0,0.0);
-			glVertex2f(450,150);
-			glVertex2f(500,150);
-			glColor3f(0.0,0.0,1.0);
-			glVertex2f(450,100);
-			glVertex2f(450,150);
-			glColor3f(1.0,1.0,0.0);
-			glVertex2f(500,100);
-			glVertex2f(500,150);
-			glEnd();
-			glPopMatrix();
-		}
-		if(action ==3) //bottom
-		{ 
-			tx = 0.0;
-			ty = -150.0;
-			glPushMatrix();
-			glTranslatef(tx, ty, 0);
-			glBegin(GL_POLYGON);
-			glColor3f(1.0,0.0,0.0);
-			glVertex2f(450,100);
-			glVertex2f(500,100);
-			glColor3f(0.0,1.0,0.0);
-			glVertex2f(450,150);
-			glVertex2f(500,150);
-			glColor3f(0.0,0.0,1.0);
-			glVertex2f(450,100);
-			glVertex2f(450,150);
-			glColor3f(1.0,1.0,0.0);
-			glVertex2f(500,100);
-			glVertex2f(500,150);
-			glEnd();
-			glPopMatrix();
-		}
-	}
-	glFlush();
  	glFlush();
 }
 
@@ -896,72 +787,38 @@ void menu(int id)
 				break;
 		case 2: choice = 2;//play
 				break;
-        case 3: choice = 3;//final grid
-                break;
+        //case 3: choice = 3;//final grid
+               // break;
 	}
 	glutPostRedisplay();
 }
 
-void translate()
-{
-	
-}
-
-
-
 int select_action(int i)
 {
-    //printf("The value of i %d \n",i);
-    //printf("Iteration no %d \n" , iter);
-    //iter++;
-    	for(j = 0; j< 4; j++ )
+    for(j = 0; j< 4; j++ )
+	{
+		if(q_matrix[i][j] > -10000)
+		{	if(q_matrix[i][j] > max)
 			{
-				if(q_matrix[i][j] > -10000)
-				{	if(q_matrix[i][j] > max)
-					{
-						//printf("Matrix i = %d , j = %d value is %f \n",i,j,q_matrix[i][j]);
-						//printf("Before max : %f \n",max);
-						max = q_matrix[i][j];
-						//printf("After max : %f \n",max);
-						pos = j;
-					}
-				}
+				max = q_matrix[i][j];
 			}
-		
-			for(j = 0; j< 4; j++ )
-			{
-					if(q_matrix[i][j] == max)
-						{
-								max = -1;
-								return j;
-						}
-			}
+		}
+	}
+	for(j = 0; j< 4; j++ )
+	{
+	    if(q_matrix[i][j] == max)
+        {
+            max = -1;
+            return j;
+        }
+	}
 }
 
 bool gameOver(int cur_pos)
-{ 
-  if(cur_pos == 8)
-	{ 
-		/*
-				PRINT MATRIX
-        for(int a= 0; a<16; a++)
-				{
-					//for(int b = 0;b<4; b++)
-					{
-						//printf("%f    ",q_matrix[a][b]);
-					}printf("\n");
-		*/
-					printf("action array\n");
-					
-					for(c= 0 ; c< ctr; c++) 
-					{
-						printf("%d \n", action_arr[c]);
-					}
-					
-					translate();
-
-				//}
-				return true;
+{
+	if(cur_pos == 8)
+	{
+        return true;
 	}return false;
 
 }
@@ -991,7 +848,6 @@ void display(void)
 		while(!gameOver(cur_pos) )
 		{
 			action = select_action(cur_pos);
-            
 
 			if(action == 0) //left
 			{
@@ -1009,17 +865,16 @@ void display(void)
 			{
 				next_pos = cur_pos - 4;
 			}
-            
-			action_array[ctrl] = action;
-			ctrl++;
-		
+
+            action_array[ctrl] = action;
+            ctrl++;
 			if(next_pos == 4 || next_pos == 6 || next_pos == 9)
 			{
 				next_pos = 0;
-				printf("start again");
 				learning_rate = 0;
 				q_matrix[cur_pos][action] = -10000;
 				action_array[ctrl] = 10;
+				last_death = ctrl;
                 ctrl++;
 			}
 			else 
@@ -1039,8 +894,15 @@ void display(void)
 			q_matrix[cur_pos][action] = q_matrix[cur_pos][action] + learning_rate * ( reward + 1*(q_matrix[next_pos][pos]) - q_matrix[cur_pos][action] );
 			cur_pos = next_pos;
 		}
+
+
+			for(int i = 0;i<ctrl;i++)
+    {
+        printf("%d  ",action_array[i]);
+    }
+	printf("done\n");
 		translate();
-		choice = 3;
+		
   }
 
 }
