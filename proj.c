@@ -1,7 +1,7 @@
 #include<stdio.h>
-//#include<GL/glut.h>
-#include<GLUT/glut.h>
-#include<OpenGL/gl.h>
+#include<GL/glut.h>
+//#include<GLUT/glut.h>
+//#include<OpenGL/gl.h>
 #include<math.h>
 #include<stdbool.h>
 #include<time.h>
@@ -85,97 +85,6 @@ float posx = 0.0, posy = 0.0;
 
 int last_death;
 int z;
-void move_square(tx,ty)
-{
-		printf("tx = %d \n",tx);
-		printf("ty = %d \n",ty);
- 		glClear(GL_COLOR_BUFFER_BIT);
-		glPushMatrix();
-        grid();
-        wumpus();
-		if(tx != 0){
-			for(int a = 0;a < tx;a+=10)
-			{
-			glBegin(GL_POLYGON);
-			glColor3f(1.0,0.0,0.0);
-			o = o+10;
-			o1 = o1+10;
-			o2 = o2+ty;
-			o3 = o3+ty;
-			printf("%d \n",a);
-			printf("o = %d \n",o);
-			printf("o1 = %d \n",o1);
-			printf("o2 = %d \n",o2);
-			printf("o3 = %d \n",o3);
-			glVertex2f(o,o2);
-			glVertex2f(o1,o2);
-			glColor3f(0.0,1.0,0.0);
-			glVertex2f(o,o3);
-			glVertex2f(o1,o3);
-			glColor3f(0.0,0.0,1.0);
-			glVertex2f(o,o2);
-			glVertex2f(o,o3);
-			glColor3f(1.0,1.0,0.0);
-			glVertex2f(o1,o2);
-			glVertex2f(o1,o3);
-			
-			glEnd();
-			}
-		}
-		if(ty != 0)
-		{
-			for(int a = 0;a < ty;a+=10)
-			{
-			glBegin(GL_POLYGON);
-			glColor3f(1.0,0.0,0.0);
-			o = o+tx;
-			o1 = o1+tx;
-			o2 = o2+10;
-			o3 = o3+10;
-			printf("o = %d \n",o);
-			printf("o1 = %d \n",o1);
-			printf("o2 = %d \n",o2);
-			printf("o3 = %d \n",o3);
-			glVertex2f(o,o2);
-			glVertex2f(o1,o2);
-			glColor3f(0.0,1.0,0.0);
-			glVertex2f(o,o3);
-			glVertex2f(o1,o3);
-			glColor3f(0.0,0.0,1.0);
-			glVertex2f(o,o2);
-			glVertex2f(o,o3);
-			glColor3f(1.0,1.0,0.0);
-			glVertex2f(o1,o2);
-			glVertex2f(o1,o3);
-			glEnd();
-			}
-		}
-		/*
-    	    glBegin(GL_POLYGON);
-			glColor3f(1.0,0.0,0.0);
-			o = o+tx;
-			o1 = o1+tx;
-			o2 = o2+ty;
-			o3 = o3+ty;
-			printf("o = %d \n",o);
-			printf("o1 = %d \n",o1);
-			printf("o2 = %d \n",o2);
-			printf("o3 = %d \n",o3);
-			glVertex2f(o,o2);
-			glVertex2f(o1,o2);
-			glColor3f(0.0,1.0,0.0);
-			glVertex2f(o,o3);
-			glVertex2f(o1,o3);
-			glColor3f(0.0,0.0,1.0);
-			glVertex2f(o,o2);
-			glVertex2f(o,o3);
-			glColor3f(1.0,1.0,0.0);
-			glVertex2f(o1,o2);
-			glVertex2f(o1,o3);
-			glEnd(); */
-		glPopMatrix();
-        glFlush();
-}
 
 void final_page()
 {
@@ -192,11 +101,11 @@ void final_page()
 	float rounded_up = ceilf(val * 100) / 100;
     gcvt(rounded_up, MAX, buf);
     drawstring(407.0,125.0,0.0,buf);
-	
+
 	val = q_matrix[0][1];
 	rounded_up = ceilf(val * 100) / 100;
     gcvt(rounded_up, MAX, buf);
-    drawstring(490.0,125.0,0.0,buf);
+    drawstring(500.0,125.0,0.0,buf);
 
     val = q_matrix[0][2];
 	rounded_up = ceilf(val * 100) / 100;
@@ -253,40 +162,19 @@ void final_page()
     gcvt(rounded_up, MAX, buf);
     drawstring(750.0,83.0,0.0,buf);
 
-//gold
-    value = 20000.0;
-    gcvt(value, MAX, buf);
-    drawstring(447.0,425.0,0.0,buf);
-
-//wumpus
-    value = -20000.0;
-    gcvt(value, MAX, buf);
-    drawstring(595.0,425.0,0.0,buf);
-
-//wumpus
-    value = -20000.0;
-    gcvt(value, MAX, buf);
-    drawstring(447.0,275.0,0.0,buf);
-
-//wumpus
-    value = -20000.0;
-    gcvt(value, MAX, buf);
-    drawstring(747.0,275.0,0.0,buf);
-
 //4
-    
     val = q_matrix[3][0];
     rounded_up = ceilf(val * 100) / 100;
     gcvt(rounded_up, MAX, buf);
     drawstring(857.0,125.0,0.0,buf);
 
-    
+
     val = q_matrix[3][1];
     rounded_up = ceilf(val * 100) / 100;
     gcvt(rounded_up, MAX, buf);
-    drawstring(950.0,125.0,0.0,buf);
+    drawstring(931.0,125.0,0.0,buf);
 
-    
+
     val = q_matrix[3][2];
     rounded_up = ceilf(val * 100) / 100;
     gcvt(rounded_up, MAX, buf);
@@ -296,6 +184,276 @@ void final_page()
     rounded_up = ceilf(val * 100) / 100;
     gcvt(rounded_up, MAX, buf);
     drawstring(900.0,83.0,0.0,buf);
+/////////////////////////////////////////////////////////////////////////////////////////////
+//5
+    val = -10000;
+	rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(407.0,275.0,0.0,buf);
+
+	val = -10000;
+	rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(490.0,275.0,0.0,buf);
+
+    val = -10000;
+	rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(450.0,312.5,0.0,buf);
+
+    val = -10000;
+	rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(450.0,233.0,0.0,buf);
+
+//6
+    val = q_matrix[5][0];
+    rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(557.0,275.0,0.0,buf);
+
+
+    val = q_matrix[5][1];
+    rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(650.0,275.0,0.0,buf);
+
+
+    val = q_matrix[5][2];
+	rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(600.0,312.5,0.0,buf);
+
+
+    val = q_matrix[5][3];
+	rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(600.0,233.0,0.0,buf);
+
+//7
+    val = -10000;
+	rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(707.0,275.0,0.0,buf);
+
+    val = -10000;
+	rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(783.0,275.0,0.0,buf);
+
+    val = -10000;
+	rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(750.0,312.5,0.0,buf);
+
+    val = -10000;
+	rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(750.0,233.0,0.0,buf);
+
+//8
+    val = q_matrix[7][0];
+    rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(857.0,275.0,0.0,buf);
+
+
+    val = q_matrix[7][1];
+    rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(931.0,275.0,0.0,buf);
+
+
+    val = q_matrix[7][2];
+    rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(900.0,312.5,0.0,buf);
+
+    val = q_matrix[7][3];
+    rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(900.0,233.0,0.0,buf);
+////////////////////////////////////////////////////////////////////////////////////
+//9
+    val = q_matrix[8][0];
+	rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(407.0,425.0,0.0,buf);
+
+	val = q_matrix[8][1];
+	rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(490.0,425.0,0.0,buf);
+
+    val = q_matrix[8][2];
+	rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(450.0,462.5,0.0,buf);
+
+    val = q_matrix[8][3];
+	rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(450.0,383.0,0.0,buf);
+
+//10
+    val = -10000;
+    rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(557.0,425.0,0.0,buf);
+
+
+    val = -10000;
+    rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(650.0,425.0,0.0,buf);
+
+
+    val = -10000;
+	rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(600.0,462.5,0.0,buf);
+
+
+    val = -10000;
+	rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(600.0,383.0,0.0,buf);
+
+//11
+    val = q_matrix[10][0];
+	rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(707.0,425.0,0.0,buf);
+
+    val = q_matrix[10][1];
+	rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(783.0,425.0,0.0,buf);
+
+    val = q_matrix[10][2];
+	rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(750.0,462.5,0.0,buf);
+
+    val = q_matrix[10][3];
+	rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(750.0,383.0,0.0,buf);
+
+//12
+    val = q_matrix[11][0];
+    rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(857.0,425.0,0.0,buf);
+
+
+    val = q_matrix[11][1];
+    rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(931.0,425.0,0.0,buf);
+
+
+    val = q_matrix[11][2];
+    rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(900.0,462.5,0.0,buf);
+
+    val = q_matrix[11][3];
+    rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(900.0,383.0,0.0,buf);
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+//13
+    val = q_matrix[12][0];
+	rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(407.0,575.0,0.0,buf);
+
+	val = q_matrix[12][1];
+	rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(490.0,575.0,0.0,buf);
+
+    val = q_matrix[12][2];
+	rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(450.0,612.5,0.0,buf);
+
+    val = q_matrix[12][3];
+	rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(450.0,533.0,0.0,buf);
+
+//14
+    val = q_matrix[13][0];
+    rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(557.0,575.0,0.0,buf);
+
+
+    val = q_matrix[13][1];
+    rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(650.0,575.0,0.0,buf);
+
+
+    val = q_matrix[13][2];
+	rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(600.0,612.5,0.0,buf);
+
+
+    val = q_matrix[13][3];
+	rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(600.0,533.0,0.0,buf);
+
+//15
+    val = q_matrix[14][0];
+	rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(707.0,575.0,0.0,buf);
+
+    val = q_matrix[14][1];
+	rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(783.0,575.0,0.0,buf);
+
+    val = q_matrix[14][2];
+	rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(750.0,612.5,0.0,buf);
+
+    val = q_matrix[14][3];
+	rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(750.0,533.0,0.0,buf);
+
+//16
+    val = q_matrix[15][0];
+    rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(857.0,575.0,0.0,buf);
+
+
+    val = q_matrix[15][1];
+    rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(931.0,575.0,0.0,buf);
+
+
+    val = q_matrix[15][2];
+    rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(900.0,612.5,0.0,buf);
+
+    val = q_matrix[15][3];
+    rounded_up = ceilf(val * 100) / 100;
+    gcvt(rounded_up, MAX, buf);
+    drawstring(900.0,533.0,0.0,buf);
+////////////////////////////////////////////////////////////////////////////////////
+
 }
 
 void translate()
@@ -313,7 +471,7 @@ void translate()
 			square();
 			glPopMatrix();
 		}
-		
+
 		else if (action_array[z] ==1 )
 		{
 			tx = 150.0;
@@ -413,7 +571,7 @@ void square()
 				glColor3f(1.0,1.0,0.0);
 				glVertex2f(500,100);
 				glVertex2f(500,150);
-			glEnd(); 
+			glEnd();
 	 }
  	glFlush();
 }
