@@ -1,7 +1,7 @@
 #include<stdio.h>
-#include<GL/glut.h>
-//#include<GLUT/glut.h>
-//#include<OpenGL/gl.h>
+//#include<GL/glut.h>
+#include<GLUT/glut.h>
+#include<OpenGL/gl.h>
 #include<math.h>
 #include<stdbool.h>
 #include<time.h>
@@ -10,7 +10,6 @@
 #define pi 3.142857
 #define discount 1
 #define MAX 6
-void final_page();
 
 float q_matrix[16][4] = { {-10000, 0, 0, -10000},
 							{0, 0, 0, -10000},
@@ -30,27 +29,25 @@ float q_matrix[16][4] = { {-10000, 0, 0, -10000},
                             {0, -10000, -10000, 0}
 						};
 float value = 0.0;
-int box = 0;
 int cur_pos = 0;
 float max =-1;
 float val = 0;
 int next_pos = 0;
 int action = 1;
 float reward = -0.04;
-void translate();
+
 int j=0, i = 0, pos = 0, tx = 0, ty = 0;
 float learning_rate = 0.5;
 int select_action(int);
 bool gameOver(int);
+
 int circle_points = 100;
-GLint a=0,b=0,flag=0;
-GLfloat red=0,blue=1,green=.3;
+int flag = 0;
 GLfloat yr,xr;
 int score = 505;
 int choice = 0;
 int iter = 0;
 
-GLfloat p=0,q=0,r=0;
 void mydisplay();
 void wumpus();
 void display();
@@ -64,30 +61,20 @@ void control();
 void helpscreen();
 void menu();
 void *currentfont;
-void delay(unsigned int mseconds);
-void move_square(int tx,int ty);
-int count = 0;
+void final_page();
+void translate();
+
 int action_array[200];
-int ctrl = 0;
-float x = 0.0;
-char buf[MAX];
-
-int l = 0;
-int o = 450;
-int o1 = 500;
-int o2 = 100;
-int o3 = 150;
-float up = 130.0;
-float left = 405.0;
-float up1 = 0.0;
-float left1 = 0.0;
 float posx = 0.0, posy = 0.0;
-
 int last_death;
 int z;
+int ctrl = 0;
 
-void final_page()
+char buf[MAX];
+
+void final_page() //finalGrid
 {
+	
 	glClear(GL_COLOR_BUFFER_BIT);
     glPushMatrix();
 	glClearColor(0,0.5,0.5,1.0); //grid background
@@ -101,11 +88,11 @@ void final_page()
 	float rounded_up = ceilf(val * 100) / 100;
     gcvt(rounded_up, MAX, buf);
     drawstring(407.0,125.0,0.0,buf);
-
+	
 	val = q_matrix[0][1];
 	rounded_up = ceilf(val * 100) / 100;
     gcvt(rounded_up, MAX, buf);
-    drawstring(500.0,125.0,0.0,buf);
+    drawstring(490.0,125.0,0.0,buf);
 
     val = q_matrix[0][2];
 	rounded_up = ceilf(val * 100) / 100;
@@ -168,12 +155,10 @@ void final_page()
     gcvt(rounded_up, MAX, buf);
     drawstring(857.0,125.0,0.0,buf);
 
-
     val = q_matrix[3][1];
     rounded_up = ceilf(val * 100) / 100;
     gcvt(rounded_up, MAX, buf);
-    drawstring(931.0,125.0,0.0,buf);
-
+    drawstring(950.0,125.0,0.0,buf);
 
     val = q_matrix[3][2];
     rounded_up = ceilf(val * 100) / 100;
@@ -184,309 +169,307 @@ void final_page()
     rounded_up = ceilf(val * 100) / 100;
     gcvt(rounded_up, MAX, buf);
     drawstring(900.0,83.0,0.0,buf);
-/////////////////////////////////////////////////////////////////////////////////////////////
+
 //5
-    val = -10000;
+	val = -10000;
 	rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(407.0,275.0,0.0,buf);
+	gcvt(rounded_up, MAX, buf);
+	drawstring(407.0,275.0,0.0,buf);
 
 	val = -10000;
 	rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(490.0,275.0,0.0,buf);
+	gcvt(rounded_up, MAX, buf);
+	drawstring(490.0,275.0,0.0,buf);
 
-    val = -10000;
+	val = -10000;
 	rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(450.0,312.5,0.0,buf);
+	gcvt(rounded_up, MAX, buf);
+	drawstring(450.0,312.5,0.0,buf);
 
-    val = -10000;
+	val = -10000;
 	rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(450.0,233.0,0.0,buf);
+	gcvt(rounded_up, MAX, buf);
+	drawstring(450.0,233.0,0.0,buf);
 
 //6
-    val = q_matrix[5][0];
-    rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(557.0,275.0,0.0,buf);
-
-
-    val = q_matrix[5][1];
-    rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(650.0,275.0,0.0,buf);
-
-
-    val = q_matrix[5][2];
+	val = q_matrix[5][0];
 	rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(600.0,312.5,0.0,buf);
+	gcvt(rounded_up, MAX, buf);
+	drawstring(557.0,275.0,0.0,buf);
 
 
-    val = q_matrix[5][3];
+	val = q_matrix[5][1];
 	rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(600.0,233.0,0.0,buf);
+	gcvt(rounded_up, MAX, buf);
+	drawstring(650.0,275.0,0.0,buf);
+
+
+	val = q_matrix[5][2];
+	rounded_up = ceilf(val * 100) / 100;
+	gcvt(rounded_up, MAX, buf);
+	drawstring(600.0,312.5,0.0,buf);
+
+
+	val = q_matrix[5][3];
+	rounded_up = ceilf(val * 100) / 100;
+	gcvt(rounded_up, MAX, buf);
+	drawstring(600.0,233.0,0.0,buf);
 
 //7
-    val = -10000;
+	val = -10000;
 	rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(707.0,275.0,0.0,buf);
+	gcvt(rounded_up, MAX, buf);
+	drawstring(707.0,275.0,0.0,buf);
 
-    val = -10000;
+	val = -10000;
 	rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(783.0,275.0,0.0,buf);
+	gcvt(rounded_up, MAX, buf);
+	drawstring(783.0,275.0,0.0,buf);
 
-    val = -10000;
+	val = -10000;
 	rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(750.0,312.5,0.0,buf);
+	gcvt(rounded_up, MAX, buf);
+	drawstring(750.0,312.5,0.0,buf);
 
-    val = -10000;
+	val = -10000;
 	rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(750.0,233.0,0.0,buf);
+	gcvt(rounded_up, MAX, buf);
+	drawstring(750.0,233.0,0.0,buf);
 
 //8
-    val = q_matrix[7][0];
-    rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(857.0,275.0,0.0,buf);
-
-
-    val = q_matrix[7][1];
-    rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(931.0,275.0,0.0,buf);
-
-
-    val = q_matrix[7][2];
-    rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(900.0,312.5,0.0,buf);
-
-    val = q_matrix[7][3];
-    rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(900.0,233.0,0.0,buf);
-////////////////////////////////////////////////////////////////////////////////////
-//9
-    val = q_matrix[8][0];
+	val = q_matrix[7][0];
 	rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(407.0,425.0,0.0,buf);
+	gcvt(rounded_up, MAX, buf);
+	drawstring(857.0,275.0,0.0,buf);
+
+
+	val = q_matrix[7][1];
+	rounded_up = ceilf(val * 100) / 100;
+	gcvt(rounded_up, MAX, buf);
+	drawstring(931.0,275.0,0.0,buf);
+
+
+	val = q_matrix[7][2];
+	rounded_up = ceilf(val * 100) / 100;
+	gcvt(rounded_up, MAX, buf);
+	drawstring(900.0,312.5,0.0,buf);
+
+	val = q_matrix[7][3];
+	rounded_up = ceilf(val * 100) / 100;
+	gcvt(rounded_up, MAX, buf);
+	drawstring(900.0,233.0,0.0,buf);
+
+//9
+	val = q_matrix[8][0];
+	rounded_up = ceilf(val * 100) / 100;
+	gcvt(rounded_up, MAX, buf);
+	drawstring(407.0,425.0,0.0,buf);
 
 	val = q_matrix[8][1];
 	rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(490.0,425.0,0.0,buf);
+	gcvt(rounded_up, MAX, buf);
+	drawstring(490.0,425.0,0.0,buf);
 
-    val = q_matrix[8][2];
+	val = q_matrix[8][2];
 	rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(450.0,462.5,0.0,buf);
+	gcvt(rounded_up, MAX, buf);
+	drawstring(450.0,462.5,0.0,buf);
 
-    val = q_matrix[8][3];
+	val = q_matrix[8][3];
 	rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(450.0,383.0,0.0,buf);
+	gcvt(rounded_up, MAX, buf);
+	drawstring(450.0,383.0,0.0,buf);
 
 //10
-    val = -10000;
-    rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(557.0,425.0,0.0,buf);
-
-
-    val = -10000;
-    rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(650.0,425.0,0.0,buf);
-
-
-    val = -10000;
+	val = -10000;
 	rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(600.0,462.5,0.0,buf);
+	gcvt(rounded_up, MAX, buf);
+	drawstring(557.0,425.0,0.0,buf);
 
 
-    val = -10000;
+	val = -10000;
 	rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(600.0,383.0,0.0,buf);
+	gcvt(rounded_up, MAX, buf);
+	drawstring(650.0,425.0,0.0,buf);
+
+
+	val = -10000;
+	rounded_up = ceilf(val * 100) / 100;
+	gcvt(rounded_up, MAX, buf);
+	drawstring(600.0,462.5,0.0,buf);
+
+
+	val = -10000;
+	rounded_up = ceilf(val * 100) / 100;
+	gcvt(rounded_up, MAX, buf);
+	drawstring(600.0,383.0,0.0,buf);
 
 //11
-    val = q_matrix[10][0];
+	val = q_matrix[10][0];
 	rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(707.0,425.0,0.0,buf);
+	gcvt(rounded_up, MAX, buf);
+	drawstring(707.0,425.0,0.0,buf);
 
-    val = q_matrix[10][1];
+	val = q_matrix[10][1];
 	rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(783.0,425.0,0.0,buf);
+	gcvt(rounded_up, MAX, buf);
+	drawstring(783.0,425.0,0.0,buf);
 
-    val = q_matrix[10][2];
+	val = q_matrix[10][2];
 	rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(750.0,462.5,0.0,buf);
+	gcvt(rounded_up, MAX, buf);
+	drawstring(750.0,462.5,0.0,buf);
 
-    val = q_matrix[10][3];
+	val = q_matrix[10][3];
 	rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(750.0,383.0,0.0,buf);
+	gcvt(rounded_up, MAX, buf);
+	drawstring(750.0,383.0,0.0,buf);
 
 //12
-    val = q_matrix[11][0];
-    rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(857.0,425.0,0.0,buf);
-
-
-    val = q_matrix[11][1];
-    rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(931.0,425.0,0.0,buf);
-
-
-    val = q_matrix[11][2];
-    rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(900.0,462.5,0.0,buf);
-
-    val = q_matrix[11][3];
-    rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(900.0,383.0,0.0,buf);
-////////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////
-//13
-    val = q_matrix[12][0];
+	val = q_matrix[11][0];
 	rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(407.0,575.0,0.0,buf);
+	gcvt(rounded_up, MAX, buf);
+	drawstring(857.0,425.0,0.0,buf);
+
+
+	val = q_matrix[11][1];
+	rounded_up = ceilf(val * 100) / 100;
+	gcvt(rounded_up, MAX, buf);
+	drawstring(931.0,425.0,0.0,buf);
+
+
+	val = q_matrix[11][2];
+	rounded_up = ceilf(val * 100) / 100;
+	gcvt(rounded_up, MAX, buf);
+	drawstring(900.0,462.5,0.0,buf);
+
+	val = q_matrix[11][3];
+	rounded_up = ceilf(val * 100) / 100;
+	gcvt(rounded_up, MAX, buf);
+	drawstring(900.0,383.0,0.0,buf);
+//13
+	val = q_matrix[12][0];
+	rounded_up = ceilf(val * 100) / 100;
+	gcvt(rounded_up, MAX, buf);
+	drawstring(407.0,575.0,0.0,buf);
 
 	val = q_matrix[12][1];
 	rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(490.0,575.0,0.0,buf);
+	gcvt(rounded_up, MAX, buf);
+	drawstring(490.0,575.0,0.0,buf);
 
-    val = q_matrix[12][2];
+	val = q_matrix[12][2];
 	rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(450.0,612.5,0.0,buf);
+	gcvt(rounded_up, MAX, buf);
+	drawstring(450.0,612.5,0.0,buf);
 
-    val = q_matrix[12][3];
+	val = q_matrix[12][3];
 	rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(450.0,533.0,0.0,buf);
+	gcvt(rounded_up, MAX, buf);
+	drawstring(450.0,533.0,0.0,buf);
 
 //14
-    val = q_matrix[13][0];
-    rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(557.0,575.0,0.0,buf);
-
-
-    val = q_matrix[13][1];
-    rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(650.0,575.0,0.0,buf);
-
-
-    val = q_matrix[13][2];
+	val = q_matrix[13][0];
 	rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(600.0,612.5,0.0,buf);
+	gcvt(rounded_up, MAX, buf);
+	drawstring(557.0,575.0,0.0,buf);
 
 
-    val = q_matrix[13][3];
+	val = q_matrix[13][1];
 	rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(600.0,533.0,0.0,buf);
+	gcvt(rounded_up, MAX, buf);
+	drawstring(650.0,575.0,0.0,buf);
+
+
+	val = q_matrix[13][2];
+	rounded_up = ceilf(val * 100) / 100;
+	gcvt(rounded_up, MAX, buf);
+	drawstring(600.0,612.5,0.0,buf);
+
+
+	val = q_matrix[13][3];
+	rounded_up = ceilf(val * 100) / 100;
+	gcvt(rounded_up, MAX, buf);
+	drawstring(600.0,533.0,0.0,buf);
 
 //15
-    val = q_matrix[14][0];
+	val = q_matrix[14][0];
 	rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(707.0,575.0,0.0,buf);
+	gcvt(rounded_up, MAX, buf);
+	drawstring(707.0,575.0,0.0,buf);
 
-    val = q_matrix[14][1];
+	val = q_matrix[14][1];
 	rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(783.0,575.0,0.0,buf);
+	gcvt(rounded_up, MAX, buf);
+	drawstring(783.0,575.0,0.0,buf);
 
-    val = q_matrix[14][2];
+	val = q_matrix[14][2];
 	rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(750.0,612.5,0.0,buf);
+	gcvt(rounded_up, MAX, buf);
+	drawstring(750.0,612.5,0.0,buf);
 
-    val = q_matrix[14][3];
+	val = q_matrix[14][3];
 	rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(750.0,533.0,0.0,buf);
+	gcvt(rounded_up, MAX, buf);
+	drawstring(750.0,533.0,0.0,buf);
 
 //16
-    val = q_matrix[15][0];
-    rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(857.0,575.0,0.0,buf);
+	val = q_matrix[15][0];
+	rounded_up = ceilf(val * 100) / 100;
+	gcvt(rounded_up, MAX, buf);
+	drawstring(857.0,575.0,0.0,buf);
 
+	val = q_matrix[15][1];
+	rounded_up = ceilf(val * 100) / 100;
+	gcvt(rounded_up, MAX, buf);
+	drawstring(931.0,575.0,0.0,buf);
 
-    val = q_matrix[15][1];
-    rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(931.0,575.0,0.0,buf);
+	val = q_matrix[15][2];
+	rounded_up = ceilf(val * 100) / 100;
+	gcvt(rounded_up, MAX, buf);
+	drawstring(900.0,612.5,0.0,buf);
 
-
-    val = q_matrix[15][2];
-    rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(900.0,612.5,0.0,buf);
-
-    val = q_matrix[15][3];
-    rounded_up = ceilf(val * 100) / 100;
-    gcvt(rounded_up, MAX, buf);
-    drawstring(900.0,533.0,0.0,buf);
-////////////////////////////////////////////////////////////////////////////////////
-
+	val = q_matrix[15][3];
+	rounded_up = ceilf(val * 100) / 100;
+	gcvt(rounded_up, MAX, buf);
+	drawstring(900.0,533.0,0.0,buf);
+	
 }
 
 void translate()
 {
-    if(choice == 5)  //learn
+	if(choice == 1) //learn
 	{
-
 		if(action_array[z] ==0 )
 		{
 			tx = -150.0;
 			ty = 0.0;
 			posx+=tx; posy+=ty;
+			sleep(1);
 			glPushMatrix();
 			glTranslatef(posx, posy, 0.0);
 			square();
 			glPopMatrix();
+			
 		}
-
 		else if (action_array[z] ==1 )
 		{
 			tx = 150.0;
 			ty = 0.0;
 			posx+=tx; posy+=ty;
+			sleep(1);
 			glPushMatrix();
 			glTranslatef(posx, posy, 0.0);
 			square();
 			glPopMatrix();
+			
 		}
 		else if(action_array[z] == 2 )
 		{
 			tx = 0.0;
 			ty = 150.0;
 			posx+=tx; posy+=ty;
+			sleep(1);
 			glPushMatrix();
 			glTranslatef(posx, posy, 0.0);
 			square();
@@ -497,46 +480,58 @@ void translate()
 			tx = 0.0;
 			ty = -150.0;
 			posx+=tx; posy+=ty;
+			sleep(1);
 			glPushMatrix();
 			glTranslatef(posx, posy, 0.0);
 			square();
-			glPopMatrix();
+			glPopMatrix();		
 		}
-		if(z<ctrl-1) z++;
-		else flag=2;
-		sleep(1);
-		//for(int i=0;i<10000;i++)
-		//	for(int j=0;j<10000;j++);
+		if(z <ctrl) z++;
+		else
+		{
+			final_page();
+		}
 	}
 }
-
 void square()
 {
-	glColor3f(0.75,0.75,0.75);
     if(choice ==2)  //play
 	{
 		if(xr == 0 && yr == 150 || xr == 150 && yr == 300 || xr == 300 && yr == 150 || score < 0)
         {
 			setFont(GLUT_BITMAP_TIMES_ROMAN_24);
-			glClearColor(0,0.5,0.5,1.0);/*background for cover page and grid */
-			glClear(GL_COLOR_BUFFER_BIT);
-			drawstring(650.0,500.0,0.0,"You lost :-(");
-			choice = 0;
-			xr = 0;
-			yr = 0;
+			//glClearColor(0,0.5,0.5,1.0);/*background for cover page and grid */
+			//glClear(GL_COLOR_BUFFER_BIT);
+			drawstring(650.0,660.0,0.0,"You lost :-(");
+			//choice = 0;
+			//xr = 0;
+			//yr = 0;
 			score = 505;
         }
         else if (xr == 0 && yr == 300)
         {
 			setFont(GLUT_BITMAP_TIMES_ROMAN_24);
-			glClearColor(0,0.5,0.5,1.0);/*background for cover page and grid */
-			glClear(GL_COLOR_BUFFER_BIT);
-			glColor3f(0,1,0);
-			drawstring(450.0,350.0,0.0,"You win! :-)");
-			choice = 0;
+			//glClearColor(0,0.5,0.5,1.0);/*background for cover page and grid */
+			//glClear(GL_COLOR_BUFFER_BIT);
+			drawstring(650.0,660.0,0.0,"You win! :-)");
+			//choice = 0;
 			xr = 0;
-			yr = 0;
+			yr = 300;
 			score = 505;
+			glBegin(GL_POLYGON);
+				glColor3f(1.0,0.0,0.0);
+				glVertex2f(xr+450,yr+100);
+				glVertex2f(xr+500,yr+100);
+				glColor3f(0.0,1.0,0.0);
+				glVertex2f(xr+450,yr+150);
+				glVertex2f(xr+500,yr+150);
+				glColor3f(0.0,0.0,1.0);
+				glVertex2f(xr+450,yr+100);
+				glVertex2f(xr+450,yr+150);
+				glColor3f(1.0,1.0,0.0);
+				glVertex2f(xr+500,yr+100);
+				glVertex2f(xr+500,yr+150);
+			glEnd();
         }
         else
 	    {
@@ -556,10 +551,10 @@ void square()
 			glEnd();
         }
  	}
-	 if(choice ==1 || choice ==5) //learn
-	 {
-		glBegin(GL_POLYGON);
-				glColor3f(1.0,0.0,0.0);
+	if(choice ==1) //learn
+	{
+	glBegin(GL_POLYGON);
+			glColor3f(1.0,0.0,0.0);
 				glVertex2f(450,100);
 				glVertex2f(500,100);
 				glColor3f(0.0,1.0,0.0);
@@ -570,12 +565,11 @@ void square()
 				glVertex2f(450,150);
 				glColor3f(1.0,1.0,0.0);
 				glVertex2f(500,100);
-				glVertex2f(500,150);
-			glEnd();
-	 }
+				glVertex2f(500,150);	
+		glEnd();
+	}
  	glFlush();
 }
-
 void wumpus()
 {
 	//1
@@ -795,7 +789,6 @@ void wumpus()
 			glEnd();
 }
 
-
 void grid()
 {
 	glPushMatrix();
@@ -832,12 +825,10 @@ void grid()
 	glPopMatrix();
 }
 
-
 void setFont(void *font)
 {
 	currentfont=font;
 }
-
 
 void drawstring(float x,float y,float z,char *string)
 {
@@ -849,11 +840,10 @@ void drawstring(float x,float y,float z,char *string)
 	}
 }
 
-void frontscreen(void) //ENTER SCREEN
+void frontscreen(void) 
 {
 	setFont(GLUT_BITMAP_TIMES_ROMAN_24);
-	//glClearColor(0.15,0.1,0.01,0);/*background for cover page*/
-	glClearColor(1.0,1.0,1.0,1.0); //doesnt matter
+	//glClearColor(1.0,1.0,1.0,1.0); //doesnt matter
 	glClear(GL_COLOR_BUFFER_BIT);
 	glBegin(GL_POLYGON); //1346, 728
 		glColor3f(1.0,0.0,0.0);
@@ -880,51 +870,66 @@ void frontscreen(void) //ENTER SCREEN
 	drawstring(360,450,0.0,"WUMPUS WORLD PROBLEM - AN AI ALGORITHM");
 	//glColor3f(1,0.5,0);
 	glColor3f(1,1,1);
-	drawstring(100,360,0.0,"BY:");
+	drawstring(650,300,0.0,"BY:");
 	glColor3f(1,1,1);
-	drawstring(100,300,0.0,"Anisha Khetan      1PE16CS022");
+	drawstring(450,250,0.0,"ANISHA KHETAN      1PE16CS022");
 	glColor3f(1,1,1);
-	drawstring(100,240,0.0,"Ashwini Kelkar      1PE16CS034");
+	drawstring(450,200,0.0,"ASHWINI KELKAR      1PE16CS034");
 	//glColor3f(1,0.5,0);
-	glColor3f(1,1,1);
-	drawstring(930,360,0.0,"GUIDES:");
-	glColor3f(1,1,1);
-	drawstring(930,300,0.0,"Name");
-	glColor3f(1,1,1);
-	drawstring(930,240,0.0,"Name");
+	//glColor3f(1,1,1);
+	//drawstring(930,360,0.0,"GUIDES:");
+	//glColor3f(1,1,1);
+	//drawstring(930,300,0.0,"Name");
+	//glColor3f(1,1,1);
+	//drawstring(930,240,0.0,"Name");
 	//glColor3f(1,0.1,1);
-	glColor3f(1,1,1);
-	drawstring(543,100,0.0,"PRESS ENTER TO START");
+	//glColor3f(1,1,1);
+	//drawstring(543,100,0.0,"PRESS ENTER TO START");
 	glFlush();
 }
 
-void helpscreen() //TODO
+void helpscreen()
 {
+	/* The Wumpus World problem deals with an AI robot navigating its way through a 4x4 puzzle to try and find gold. The robot must safely navigate its way around the evil Wumpus creatures to locate the gold on the board.
+    An agent is placed at a location in the grid which is its starting point and is given a destination point ie gold. The actions available to the agent consist of moving in one of four directions.
+	In order to perform q-learning for this task, a description of the states, actions, and rewards is needed. A qmatrix is updated every time the agent "learns" using the Belford's Formula.
+	After training, the agent is able to find the gold while avoiding the hazards of the Wumpus World.
+
+
+	1> The environment is a grid of dimensions, here 4 x 4 squares.
+	2> A robot/agent is placed at a location in the grid which is its starting point.
+	3> The robot/agent is given a destination point. here, gold
+	4> The robot has a fixed set of actions i.e. moving right, moving left etc
+	5> The robot/agent is surrounded by walls and can only perceive the world  after coming in contact with it: i.e. bumping into wall etc
+	6> There is a rewarding system based on the action taken : for example positive reward reinforcement for correct action taken, negative reward reinforcement for incorrect action taken etc.
+	7> The objective is to implent an RL algorithm with which the robot reaches its destination.
+	
+	*/
 	setFont(GLUT_BITMAP_TIMES_ROMAN_24);
 	glClearColor(0,0.5,0.5,1.0);/*background for cover page and grid */
 	glClear(GL_COLOR_BUFFER_BIT);
-	glColor3f(0,1,0);
-	drawstring(550.0,700.0,0.0,"RULES");
-	glColor3f(1,0,0);
-	drawstring(650.0,700.0,0.0,"TO");
-	glColor3f(0,0,1);
-	drawstring(750.0,700.0,0.0,"FOLLOW");
+	glColor3f(1,1,1);
+	drawstring(400.0,630.0,0.0,"INTRODUCTION");
+	glColor3f(1,1,1);
+	drawstring(650.0,630.0,0.0,"TO");
+	glColor3f(1,1,1);
+	drawstring(750.0,630.0,0.0,"WUMPUS WORLD");
 	glColor3f(0.5,0.1,0.2);
-	drawstring(350.0,640.0,0.0,"*****                                           *****");
+	drawstring(100.0,530.0,0.0,"*  The Wumpus World problem deals with an AI robot navigating its way through a 4x4 puzzle to try and find gold.");
 	glColor3f(0.5,0.1,0.3);
-	drawstring(350.0,540.0,0.0,"*****                                           *****");
+	drawstring(100.0,460.0,0.0,"*  The robot must safely navigate its way around the 'evil' Wumpus creatures to locate the gold on the board.");
 	glColor3f(0.5,0.1,0.4);
-	drawstring(350.0,440.0,0.0,"*****                                           *****");
+	drawstring(100.0,390.0,0.0,"*  An agent is placed at a location in the grid which is its starting point and is given a destination point ie gold.");
 	glColor3f(0.4,0.1,0.5);
-	drawstring(350.0,340.0,0.0,"*****                                           *****");
+	drawstring(100.0,320.0,0.0,"*  The actions available to the agent consist of moving in one of four directions.");
 	glColor3f(0.5,0.1,0.6);
-	drawstring(350.0,240.0,0.0,"*****                                           *****");
+	//drawstring(100.0,240.0,0.0,"*****                                           *****");
 	glColor3f(0.5,0.1,0.7);
-	drawstring(350.0,140.0,0.0,"*****                                           *****");
+	drawstring(100.0,250.0,0.0,"*  In order to perform Q-learning for this task, a description of the states, actions, and rewards is needed.");
 	glColor3f(0.5,0.1,0.8);
-	drawstring(350.0,90.0,0.0,"*****                                           *****");
+	drawstring(100.0,180.0,0.0, "*  A Q-matrix is updated every time the agent 'learns' using the Belford's Formula. ");
 	glColor3f(0.5,0.1,0.9);
-	drawstring(350.0,40.0,0.0,"Escape                                                                  PRESS 'ENTER'");
+	drawstring(100.0,110.0,0.0,"*  After training, the agent is able to find the gold while avoiding the hazards of the Wumpus World.");
 	glFlush();
 }
 
@@ -933,13 +938,13 @@ void menu(int id)
 	glClear(GL_COLOR_BUFFER_BIT);
 	switch(id)
 	{
-		case 0: exit(0); break;
 		case 1: choice = 1;//learn();
 				break;
 		case 2: choice = 2;//play
 				break;
         case 3: choice = 3;//final grid
                 break;
+		case 4: exit(0); break;
 	}
 	glutPostRedisplay();
 }
@@ -967,11 +972,8 @@ int select_action(int i)
 
 bool gameOver(int cur_pos)
 {
-	if(cur_pos == 8)
-	{
-        return true;
-	}return false;
-
+	if(cur_pos == 8) return true;
+	return false;
 }
 
 void display(void)
@@ -981,7 +983,6 @@ void display(void)
     {
         final_page();
     }
-
 	if(choice ==2) //play
 	{
 		grid();
@@ -990,32 +991,17 @@ void display(void)
 		glFlush();
 	}
 	else if(choice == 1) //learn
-  {
+    {
 		grid();
 		wumpus();
-		//square();
 		glFlush();
-
 		while(!gameOver(cur_pos) )
 		{
 			action = select_action(cur_pos);
-
-			if(action == 0) //left
-			{
-				next_pos = cur_pos - 1; //new i value
-			}
-			if(action == 1) //right
-			{
-				next_pos = cur_pos +1;
-			}
-			if(action == 2) //top
-			{
-				next_pos = cur_pos +4;
-			}
-			if(action == 3) //bottom
-			{
-				next_pos = cur_pos - 4;
-			}
+			if(action == 0) next_pos = cur_pos - 1;//left		
+			if(action == 1) next_pos = cur_pos +1;//right			
+			if(action == 2) next_pos = cur_pos +4;//top			
+			if(action == 3) next_pos = cur_pos - 4;//bottom		
             action_array[ctrl] = action;
             ctrl++;
 			if(next_pos == 4 || next_pos == 6 || next_pos == 9)
@@ -1027,9 +1013,7 @@ void display(void)
 				last_death = ctrl;
                 ctrl++;
 			}
-			else {
-			learning_rate = 0.5;
-			}
+			else learning_rate = 0.5;
 			int maxa = -1;
 			for(int i1 = 0;i1<4;i1++)
             {
@@ -1042,27 +1026,18 @@ void display(void)
 			q_matrix[cur_pos][action] = q_matrix[cur_pos][action] + learning_rate * ( reward + 1*(q_matrix[next_pos][pos]) - q_matrix[cur_pos][action] );
 			cur_pos = next_pos;
 		}
-		choice = 5;
-		flag = 3;
+		flag = 3; //keep calling finaldraw which calls translate
 		z = last_death;
-   }
-   /*else if (choice==5){
-		for(int z = last_death; z < ctrl; z++)
-		{
-			grid();
-			wumpus();
-			translate(z);
-			glutSwapBuffers();
-		}
-   }*/
-
+    }
 }
+
 void finaldraw()
 {
-		grid();
-		wumpus();
-		translate();
+	grid();
+	wumpus();
+	translate();
 }
+
 void myKeyboard( unsigned char key, int x, int y )
 {
 	switch(key)
@@ -1098,7 +1073,6 @@ void mySpecial(int key, int x, int y)
 									score = score - 50;
 								}
 							}
-									//if(xr == 0 && yr == 150)
 							glutPostRedisplay();
 							break;
     	case GLUT_KEY_LEFT:
@@ -1147,8 +1121,8 @@ void mydisplay(void)
 	if(flag==2)
 		display();
 	if(flag==3)
-		finaldraw();
-	glutSwapBuffers();
+		finaldraw(); //used in learn
+	glutSwapBuffers(); //cuz Double Buffer
 }
 
 void myinit()
@@ -1157,13 +1131,12 @@ void myinit()
 	glLoadIdentity();
 	gluOrtho2D(0.0,1346.0,0.0,728.0);
 }
+
 void idle()
 {
-	if(flag==3)
-	{
-		glutPostRedisplay();
-	}
+	if(flag==3) glutPostRedisplay(); //flag 3 is finaldraw
 }
+
 int main(int argc, char* argv[])
 {
 	glutInit(&argc, argv);
@@ -1172,10 +1145,10 @@ int main(int argc, char* argv[])
 	glutInitWindowPosition(0,0);
 	glutCreateWindow("WumpusWorld");
 	glutCreateMenu(menu);
-	glutAddMenuEntry("Exit", 0);
 	glutAddMenuEntry("Learn", 1);
 	glutAddMenuEntry("Play", 2);
 	glutAddMenuEntry("FinalGrid", 3);
+	glutAddMenuEntry("Exit", 4);
 	glutAttachMenu(GLUT_RIGHT_BUTTON);
 	glutIdleFunc(idle);
 	glutDisplayFunc(mydisplay);
