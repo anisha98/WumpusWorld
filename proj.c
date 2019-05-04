@@ -1,7 +1,7 @@
 #include<stdio.h>
-//#include<GL/glut.h>
-#include<GLUT/glut.h>
-#include<OpenGL/gl.h>
+#include<GL/glut.h>
+//#include<GLUT/glut.h>
+//#include<OpenGL/gl.h>
 #include<math.h>
 #include<stdbool.h>
 #include<time.h>
@@ -43,7 +43,8 @@ bool gameOver(int);
 
 int circle_points = 100;
 int flag = 0;
-GLfloat yr,xr;
+float yr = 0;
+float xr = 0;;
 int score = 505;
 int choice = 0;
 int iter = 0;
@@ -74,7 +75,6 @@ char buf[MAX];
 
 void final_page() //finalGrid
 {
-	
 	glClear(GL_COLOR_BUFFER_BIT);
     glPushMatrix();
 	glClearColor(0,0.5,0.5,1.0); //grid background
@@ -88,7 +88,7 @@ void final_page() //finalGrid
 	float rounded_up = ceilf(val * 100) / 100;
     gcvt(rounded_up, MAX, buf);
     drawstring(407.0,125.0,0.0,buf);
-	
+
 	val = q_matrix[0][1];
 	rounded_up = ceilf(val * 100) / 100;
     gcvt(rounded_up, MAX, buf);
@@ -433,7 +433,7 @@ void final_page() //finalGrid
 	rounded_up = ceilf(val * 100) / 100;
 	gcvt(rounded_up, MAX, buf);
 	drawstring(900.0,533.0,0.0,buf);
-	
+
 }
 
 void translate()
@@ -450,7 +450,7 @@ void translate()
 			glTranslatef(posx, posy, 0.0);
 			square();
 			glPopMatrix();
-			
+
 		}
 		else if (action_array[z] ==1 )
 		{
@@ -462,7 +462,7 @@ void translate()
 			glTranslatef(posx, posy, 0.0);
 			square();
 			glPopMatrix();
-			
+
 		}
 		else if(action_array[z] == 2 )
 		{
@@ -484,54 +484,44 @@ void translate()
 			glPushMatrix();
 			glTranslatef(posx, posy, 0.0);
 			square();
-			glPopMatrix();		
+			glPopMatrix();
 		}
-		if(z <ctrl) z++;
+		if(z < ctrl-1) z++;
 		else
 		{
-			final_page();
+		    final_page();
+		    flag = 2;
+		    choice = 0;
 		}
 	}
 }
 void square()
 {
+	glColor3f(0.75,0.75,0.75);
     if(choice ==2)  //play
 	{
 		if(xr == 0 && yr == 150 || xr == 150 && yr == 300 || xr == 300 && yr == 150 || score < 0)
         {
 			setFont(GLUT_BITMAP_TIMES_ROMAN_24);
-			//glClearColor(0,0.5,0.5,1.0);/*background for cover page and grid */
-			//glClear(GL_COLOR_BUFFER_BIT);
-			drawstring(650.0,660.0,0.0,"You lost :-(");
-			//choice = 0;
-			//xr = 0;
-			//yr = 0;
+			glClearColor(0,0.5,0.5,1.0);/*background for cover page and grid */
+			glClear(GL_COLOR_BUFFER_BIT);
+			drawstring(650.0,500.0,0.0,"You lost :-(");
+			choice = 0;
+			xr = 0;
+			yr = 0;
 			score = 505;
         }
         else if (xr == 0 && yr == 300)
         {
 			setFont(GLUT_BITMAP_TIMES_ROMAN_24);
-			//glClearColor(0,0.5,0.5,1.0);/*background for cover page and grid */
-			//glClear(GL_COLOR_BUFFER_BIT);
-			drawstring(650.0,660.0,0.0,"You win! :-)");
-			//choice = 0;
+			glClearColor(0,0.5,0.5,1.0);/*background for cover page and grid */
+			glClear(GL_COLOR_BUFFER_BIT);
+			glColor3f(0,1,0);
+			drawstring(450.0,350.0,0.0,"You win! :-)");
+			choice = 0;
 			xr = 0;
-			yr = 300;
+			yr = 0;
 			score = 505;
-			glBegin(GL_POLYGON);
-				glColor3f(1.0,0.0,0.0);
-				glVertex2f(xr+450,yr+100);
-				glVertex2f(xr+500,yr+100);
-				glColor3f(0.0,1.0,0.0);
-				glVertex2f(xr+450,yr+150);
-				glVertex2f(xr+500,yr+150);
-				glColor3f(0.0,0.0,1.0);
-				glVertex2f(xr+450,yr+100);
-				glVertex2f(xr+450,yr+150);
-				glColor3f(1.0,1.0,0.0);
-				glVertex2f(xr+500,yr+100);
-				glVertex2f(xr+500,yr+150);
-			glEnd();
         }
         else
 	    {
@@ -551,10 +541,10 @@ void square()
 			glEnd();
         }
  	}
-	if(choice ==1) //learn
-	{
-	glBegin(GL_POLYGON);
-			glColor3f(1.0,0.0,0.0);
+	 if(choice ==1 ) //learn
+	 {
+		glBegin(GL_POLYGON);
+				glColor3f(1.0,0.0,0.0);
 				glVertex2f(450,100);
 				glVertex2f(500,100);
 				glColor3f(0.0,1.0,0.0);
@@ -565,11 +555,12 @@ void square()
 				glVertex2f(450,150);
 				glColor3f(1.0,1.0,0.0);
 				glVertex2f(500,100);
-				glVertex2f(500,150);	
-		glEnd();
-	}
+				glVertex2f(500,150);
+			glEnd();
+	 }
  	glFlush();
 }
+
 void wumpus()
 {
 	//1
@@ -840,7 +831,7 @@ void drawstring(float x,float y,float z,char *string)
 	}
 }
 
-void frontscreen(void) 
+void frontscreen(void)
 {
 	setFont(GLUT_BITMAP_TIMES_ROMAN_24);
 	//glClearColor(1.0,1.0,1.0,1.0); //doesnt matter
@@ -858,23 +849,23 @@ void frontscreen(void)
 	//text and the text color
 	//glColor3f(1,0,0);
 	glColor3f(1,1,1);
-	drawstring(450.0,650.0,0.0," PES INSTITUTE OF TECHNOLOGY ");
+	drawstring(450.0,610.0,0.0," PES INSTITUTE OF TECHNOLOGY ");
 	//glColor3f(0.7,0,1);
 	glColor3f(1,1,1);
-	drawstring(330,600,0.0,"DEPARTMENT OF COMPUTER SCIENCE AND ENGINEERING");
+	drawstring(330,560,0.0,"DEPARTMENT OF COMPUTER SCIENCE AND ENGINEERING");
 	//glColor3f(1,0.5,0); //background for grid
 	glColor3f(1,1,1);
-	drawstring(530,500,0.0,"A MINI PROJECT ON");
+	drawstring(530,460,0.0,"A MINI PROJECT ON");
 	//glColor3f(1,0,0);
 	glColor3f(1,1,1);
-	drawstring(360,450,0.0,"WUMPUS WORLD PROBLEM - AN AI ALGORITHM");
+	drawstring(360,410,0.0,"WUMPUS WORLD PROBLEM - AN AI ALGORITHM");
 	//glColor3f(1,0.5,0);
 	glColor3f(1,1,1);
-	drawstring(650,300,0.0,"BY:");
+	drawstring(630,300,0.0,"BY:");
 	glColor3f(1,1,1);
-	drawstring(450,250,0.0,"ANISHA KHETAN      1PE16CS022");
+	drawstring(435,250,0.0,"ANISHA KHETAN      1PE16CS022");
 	glColor3f(1,1,1);
-	drawstring(450,200,0.0,"ASHWINI KELKAR      1PE16CS034");
+	drawstring(435,200,0.0,"ASHWINI KELKAR      1PE16CS034");
 	//glColor3f(1,0.5,0);
 	//glColor3f(1,1,1);
 	//drawstring(930,360,0.0,"GUIDES:");
@@ -903,16 +894,17 @@ void helpscreen()
 	5> The robot/agent is surrounded by walls and can only perceive the world  after coming in contact with it: i.e. bumping into wall etc
 	6> There is a rewarding system based on the action taken : for example positive reward reinforcement for correct action taken, negative reward reinforcement for incorrect action taken etc.
 	7> The objective is to implent an RL algorithm with which the robot reaches its destination.
-	
+
 	*/
 	setFont(GLUT_BITMAP_TIMES_ROMAN_24);
 	glClearColor(0,0.5,0.5,1.0);/*background for cover page and grid */
 	glClear(GL_COLOR_BUFFER_BIT);
-	glColor3f(1,1,1);
+	//255/255, 63/255, 101/255
+	glColor3f(255/255, 63/255, 101/255);
 	drawstring(400.0,630.0,0.0,"INTRODUCTION");
-	glColor3f(1,1,1);
+	glColor3f(255/255, 63/255, 101/255);
 	drawstring(650.0,630.0,0.0,"TO");
-	glColor3f(1,1,1);
+	glColor3f(255/255, 63/255, 101/255);
 	drawstring(750.0,630.0,0.0,"WUMPUS WORLD");
 	glColor3f(0.5,0.1,0.2);
 	drawstring(100.0,530.0,0.0,"*  The Wumpus World problem deals with an AI robot navigating its way through a 4x4 puzzle to try and find gold.");
@@ -998,10 +990,10 @@ void display(void)
 		while(!gameOver(cur_pos) )
 		{
 			action = select_action(cur_pos);
-			if(action == 0) next_pos = cur_pos - 1;//left		
-			if(action == 1) next_pos = cur_pos +1;//right			
-			if(action == 2) next_pos = cur_pos +4;//top			
-			if(action == 3) next_pos = cur_pos - 4;//bottom		
+			if(action == 0) next_pos = cur_pos - 1;//left
+			if(action == 1) next_pos = cur_pos +1;//right
+			if(action == 2) next_pos = cur_pos +4;//top
+			if(action == 3) next_pos = cur_pos - 4;//bottom
             action_array[ctrl] = action;
             ctrl++;
 			if(next_pos == 4 || next_pos == 6 || next_pos == 9)
@@ -1028,6 +1020,8 @@ void display(void)
 		}
 		flag = 3; //keep calling finaldraw which calls translate
 		z = last_death;
+		//finaldraw();
+		//flag = 3;
     }
 }
 
