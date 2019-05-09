@@ -1119,11 +1119,12 @@ void mydisplay(void)
 	glutSwapBuffers(); //cuz Double Buffer
 }
 
-void myinit()
+void myReshape(int w,int h)
 {
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluOrtho2D(0.0,1346.0,0.0,728.0);
+    glViewport(0,0,w,h);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0.0,1346.0,0.0,728.0);
 }
 
 void idle()
@@ -1147,7 +1148,8 @@ int main(int argc, char* argv[])
 	glutIdleFunc(idle);
 	glutDisplayFunc(mydisplay);
 	glutKeyboardFunc(myKeyboard);
+	glutReshapeFunc(myReshape);
 	glutSpecialFunc(mySpecial);
-	myinit();
+//	myinit();
 	glutMainLoop();
 }
