@@ -1,1 +1,7 @@
 # WumpusWorld
+
+The Wumpus World problem deals with an AI agent navigating its way through a 4x4 puzzle to try and find gold. The robot is initially placed at a location in the grid which is the starting point and must safely navigate its way around the evil Wumpus creatures to locate the gold on the board, which is the destination point.
+The actions available to the agent consist of moving in one of four directions, left, right, top and bottom. The agent is surrounded by walls and can only perceive the world after coming in contact with it.
+We present the project as consisting of two parts. First, a manual play mode that lets the user interact with the project by moving the agent around with the help of arrow keys on the keyboard. The user is tasked with directing the agent to the gold in minimum number of moves. The second part is a a visualization of the solution to the problem using Q-learning, a type of Reinforcement learning.
+In order to perform Q-learning for this task, a description of the states and actions is maintained in a Q-table and rewards is needed which is updated every time the agent "learns" using the Belford's Formula. There is a rewarding system based on the action taken; positive reward reinforcement for correct action taken and negative reward reinforcement for incorrect action taken. The objective is to implement this formula in an algorithm using which the robot reaches its destination.
+After training, the agent is able to successfully find the gold while avoiding the hazards of the Wumpus World.
